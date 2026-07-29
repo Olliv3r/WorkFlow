@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de Produção</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<div class="sheet-wrap">
+
+  <header class="sheet-header">
+    <div class="header-left">
+      <span class="tag-number" id="tag-number">Nº ----</span>
+      <h1>Ficha de Produção</h1>
+      <p class="header-sub">Registro de itens produzidos por lote</p>
+    </div>
+    <div class="header-right">
+      <button type="button" class="link-btn" id="btn-abrir-precos">Gerenciar preços</button>
+    </div>
+  </header>
+
+  <!-- ==================== RESUMO DA DIÁRIA ==================== -->
+  <section class="summary-bar" id="summary-bar">
+    <div class="summary-item">
+      <span class="summary-label">Dúzias no dia</span>
+      <span class="summary-value" id="summary-duzias">0</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">Total da diária</span>
+      <span class="summary-value summary-value--highlight" id="summary-total">R$ 0,00</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">Quitado</span>
+      <span class="summary-value summary-value--green" id="summary-quitado">R$ 0,00</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">Pendente</span>
+      <span class="summary-value summary-value--red" id="summary-pendente">R$ 0,00</span>
+    </div>
+  </section>
+
+  <!-- ==================== FORMULÁRIO ==================== -->
+  <form id="production-form" class="ticket" novalidate>
+
+    <!-- 01 -->
+    <div class="field-row">
+      <div class="field-index">01</div>
+      <div class="field-body">
+        <label for="tipo-produto">Tipo de produto</label>
+        <input
+          type="text"
+          id="tipo-produto"
+          name="tipoProduto"
+          placeholder="ex: Vassoura de piaçava nº 4"
+          autocomplete="off"
+          required
+        >
+      </div>
+    </div>
+
+    <!-- 02: Quantidade + Etapa (função) -->
+    <div class="field-row split">
+      <div class="field-index">02</div>
+      <div class="field-body two-col">
+        <div class="sub-field">
+          <label for="quantidade">Quantidade (dúzias)</label>
+          <div class="qty-control">
+            <button type="button" class="qty-btn" data-step="-0.5" aria-label="Diminuir quantidade">–</button>
+            <input
+              type="number"
+              id="quantidade"
+              name="quantidade"
+              min="0"
+              step="0.5"
+              value="0"
+              inputmode="decimal"
+              required
+            >
+            <button type="button" class="qty-btn" data-step="0.5" aria-label="Aumentar quantidade">+</button>
+          </div>
+        </div>
+        <div class="sub-field">
+          <label for="tipo-servico">Etapa (função)</label>
+          <select id="tipo-servico" name="tipoServico" required>
+            <option value="" disabled selected>Selecione</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03: Material + Furos (definem o preço) -->
+    <div class="field-row split">
+      <div class="field-index">03</div>
+      <div class="field-body two-col">
+        <div class="sub-field">
+          <label for="material">Material</label>
+          <select id="material" name="material" required>
+            <option value="" disabled selected>Selecione</option>
+          </select>
+        </div>
+        <div class="sub-field">
+          <label for="furos">Furos do taco</label>
+          <select id="furos" name="furos" required>
+            <option value="" disabled selected>Selecione</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Valor por dúzia — editável condicionalmente. Preenche sozinho
+         quando a combinação Material+Furos já tem preço, mas sempre
+         pode ser sobrescrito aqui; isso atualiza a tabela de preços. -->
+    <div class="field-row" id="valor-duzia-row" hidden>
+      <div class="field-index">•</div>
+      <div class="field-body">
+        <label for="valor-duzia-manual">
+          Valor por dúzia (R$)
+          <span class="label-hint" id="valor-duzia-hint"></span>
+        </label>
+        <input
+          type="number"
+          id="valor-duzia-manual"
+          name="valorDuziaManual"
+          min="0"
+          step="0.01"
+          placeholder="0,00"
+        >
+      </div>
+    </div>
+
+    <!-- 04: Data + Período -->
+    <div class="field-row split">
+      <div class="field-index">04</div>
+      <div class="field-body two-col">
+        <div class="sub-field">
+          <label for="data">Data</label>
+          <input type="date" id="data" name="data" required>
+        </div>
+        <div class="sub-field">
+          <label for="periodo">Período de referência</label>
+          <select id="periodo" name="periodo" required>
+            <option value="" disabled selected>Selecione</option>
+            <option value="dia">Dia</option>
+            <option value="semana">Semana</option>
+            <option value="quinzena">Quinzena</option>
+            <option value="mes">Mês</option>
+            <option value="ano">Ano</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05: Pagamento -->
+    <div class="field-row">
+      <div class="field-index">05</div>
+      <div class="field-body">
+        <label>Pagamento</label>
+        <div class="toggle-group" id="pagamento-toggle" role="radiogroup" aria-label="Estado do pagamento">
+          <button type="button" class="toggle-btn" data-value="pendente" aria-checked="true" role="radio">
+            Pendente
+          </button>
+          <button type="button" class="toggle-btn" data-value="quitado" aria-checked="false" role="radio">
+            Quitado
+          </button>
+        </div>
+        <input type="hidden" id="pagamento" name="pagamento" value="pendente">
+      </div>
+    </div>
+
+    <!-- Prévia do valor calculado -->
+    <div class="preview-row" id="preview-row" hidden>
+      <span class="preview-label">Valor deste registro:</span>
+      <span class="preview-value" id="preview-value">R$ 0,00</span>
+    </div>
+
+    <div class="perforation" aria-hidden="true"></div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Salvar registro</button>
+      <button type="button" class="btn-ghost" id="btn-clear">Limpar campos</button>
+    </div>
+
+    <p class="form-note" id="form-note" role="status" aria-live="polite"></p>
+
+  </form>
+
+  <!-- ==================== TABELA DE REGISTROS ==================== -->
+  <section class="log-section">
+    <div class="log-header">
+      <h2>Registros salvos</h2>
+      <span class="log-count" id="log-count">0 itens</span>
+    </div>
+    <div class="log-table-wrap">
+      <table class="log-table" id="log-table">
+        <thead>
+          <tr>
+            <th>Nº</th>
+            <th>Produto</th>
+            <th>Dúzias</th>
+            <th>Etapa</th>
+            <th>Material</th>
+            <th>Furos</th>
+            <th>Valor/dz</th>
+            <th>Total</th>
+            <th>Data</th>
+            <th>Período</th>
+            <th>Pagamento</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="log-body"></tbody>
+      </table>
+      <p class="log-empty" id="log-empty">Nenhum registro ainda. Preencha a ficha acima para começar.</p>
+    </div>
+  </section>
+
+</div>
+
+<!-- ==================== MODAL: GERENCIAR PREÇOS ==================== -->
+<div class="modal-overlay" id="modal-precos" hidden>
+  <div class="modal-box modal-box--wide" role="dialog" aria-modal="true" aria-labelledby="modal-precos-titulo">
+    <div class="modal-header">
+      <h2 id="modal-precos-titulo">Gerenciar preços</h2>
+      <button type="button" class="modal-close" id="btn-fechar-precos" aria-label="Fechar">✕</button>
+    </div>
+
+    <div class="modal-tabs" role="tablist">
+      <button type="button" class="modal-tab" data-tab="precos" aria-selected="true" role="tab">
+        Tabela de preços
+      </button>
+      <button type="button" class="modal-tab" data-tab="etapas" aria-selected="false" role="tab">
+        Etapas do processo
+      </button>
+    </div>
+
+    <!-- ABA: Tabela de preços (Material x Furos) -->
+    <div class="modal-tab-panel" id="tab-panel-precos" role="tabpanel">
+      <p class="modal-tab-intro">
+        O preço por dúzia depende só do Material e da quantidade de furos do
+        taco — a etapa realizada não afeta o valor. Células em branco ainda
+        não têm preço cadastrado; edite clicando no valor.
+      </p>
+      <div class="precos-table-wrap">
+        <table class="log-table matrix-table" id="matrix-precos-table">
+          <thead>
+            <tr id="matrix-precos-head">
+              <th>Material</th>
+              <!-- colunas de furos inseridas via JS -->
+            </tr>
+          </thead>
+          <tbody id="matrix-precos-body"></tbody>
+        </table>
+      </div>
+      <p class="form-note" id="preco-note" role="status" aria-live="polite"></p>
+    </div>
+
+    <!-- ABA: Etapas do processo (CRUD simples, sem preço) -->
+    <div class="modal-tab-panel" id="tab-panel-etapas" role="tabpanel" hidden>
+      <form id="form-nova-etapa" class="modal-form">
+        <div class="modal-form-row">
+          <div class="sub-field">
+            <label for="nova-etapa-nome">Nome da etapa</label>
+            <input type="text" id="nova-etapa-nome" placeholder="ex: Amarrar" required>
+          </div>
+          <button type="submit" class="btn-primary btn-small">Adicionar</button>
+        </div>
+        <div class="modal-form-row modal-form-row--desc">
+          <div class="sub-field">
+            <label for="nova-etapa-descricao">Descrição (opcional — ajuda a diferenciar etapas parecidas)</label>
+            <input type="text" id="nova-etapa-descricao" placeholder="ex: pino no corpo do produto, não no cabo">
+          </div>
+        </div>
+        <p class="form-note" id="etapa-note" role="status" aria-live="polite"></p>
+      </form>
+
+      <div class="precos-table-wrap">
+        <table class="log-table" id="etapas-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="etapas-body"></tbody>
+        </table>
+        <p class="log-empty" id="etapas-empty">Nenhuma etapa cadastrada ainda.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
