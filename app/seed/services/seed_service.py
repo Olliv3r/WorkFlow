@@ -1,14 +1,12 @@
-from app.seed.repositories.seed_repository import SeedRepository
 from app.models import *
 from app.seed.seed_dict import *
-
-repository = SeedRepository()
+from app.production.repositories import *
 
 class SeedService:
     @staticmethod
-    def create_entity(list_dict: list, model):
+    def create_entity(list_dict: list, repository, model):
         for item in list_dict:
-            entity_existing = repository.select(model).filter_by(**item).first()
+            entity_existing = repository.filter_by(**item).first()
 
             if entity_existing:
                 continue
@@ -22,6 +20,7 @@ class SeedService:
     def create_product_families():
         return SeedService.create_entity(
             PRODUCT_FAMILIES,
+            family_repository,
             ProductFamily
         )
 
@@ -29,6 +28,7 @@ class SeedService:
     def create_materials():
         return SeedService.create_entity(
             MATERIALS,
+            material_repository,
             Material
         )
 
@@ -36,6 +36,7 @@ class SeedService:
     def create_qualities():
         return SeedService.create_entity(
             PIACABA_QUALITIES,
+            quality_repository,
             Quality
         )
 
@@ -44,6 +45,7 @@ class SeedService:
     def create_holes():
         return SeedService.create_entity(
             HOLES,
+            hole_repository,
             Hole
         )
 
@@ -52,6 +54,7 @@ class SeedService:
     def create_stick_types():
         return SeedService.create_entity(
             STICK_TYPES,
+            stick_repository,
             StickType
         )
  
@@ -60,6 +63,7 @@ class SeedService:
     def create_stages():
         return SeedService.create_entity(
             STAGES,
+            stage_repository,
             Stage
         )
 
@@ -67,39 +71,39 @@ class SeedService:
     @staticmethod
     def create_products():
         for item in PRODUCTS:
-            family = repository.select(ProductFamily).filter_by(
+            family = family_repository.filter_by(
                 name=item['family']
             ).first()
 
             if family is None:
                 raise ValueError("A família do produto não foi encontrada")
 
-            material = repository.select(Material).filter_by(
+            material = material_repository.filter_by(
                 name=item['material']
             ).first()
 
             if material is None:
                 raise ValueError("O material do produto não foi encontrado")
 
-            quality = repository.select(Quality).filter_by(
+            quality = quality_repository.filter_by(
                 name=item['quality']
             ).first()
 
-            hole = repository.select(Hole).filter_by(
+            hole = hole_repository.filter_by(
                 quantity=item['hole']
             ).first()
 
             if hole is None:
                 raise ValueError("Os furos do produto não foi encontrado")
 
-            stick_type = repository.select(StickType).filter_by(
+            stick_type = stick_repository.filter_by(
                 name=item['stick_type']
             ).first() 
 
             if stick_type is None:
                 raise ValueError('Os tipos de tacos do produto não existem')
 
-            product_existing = repository.select(Product).filter_by(
+            product_existing = product_repository.filter_by(
                 family=family,
                 material=material,
                 quality=quality,
@@ -118,8 +122,8 @@ class SeedService:
                 stick_type=stick_type
             )
 
-            repository.add(product_new)
+            product_repository.add(product_new)
 
-        return repository.commit()
+        return product_repository.commit()
 
     

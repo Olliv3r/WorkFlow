@@ -1,8 +1,8 @@
 """Migrations initialized
 
-Revision ID: d767bb1db21f
+Revision ID: 07c35a533f29
 Revises: 
-Create Date: 2026-08-07 20:02:05.925998
+Create Date: 2026-08-08 13:58:47.098735
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd767bb1db21f'
+revision = '07c35a533f29'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -75,8 +75,6 @@ def upgrade():
     )
     op.create_table('products',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=30), nullable=True),
-    sa.Column('description', sa.String(length=300), nullable=True),
     sa.Column('active', sa.Boolean(), nullable=False),
     sa.Column('family_id', sa.Integer(), nullable=False),
     sa.Column('material_id', sa.Integer(), nullable=False),
@@ -88,15 +86,14 @@ def upgrade():
     sa.ForeignKeyConstraint(['material_id'], ['materials.id'], ),
     sa.ForeignKeyConstraint(['quality_id'], ['qualities.id'], ),
     sa.ForeignKeyConstraint(['stick_type_id'], ['stick_types.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('productions',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('date', sa.Date(), nullable=False),
     sa.Column('dozens', sa.Integer(), nullable=False),
-    sa.Column('price_per_dozen', sa.Float(), nullable=False),
-    sa.Column('total_amount', sa.Integer(), nullable=False),
+    sa.Column('price_per_dozen', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('total_amount', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('observation', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('product_id', sa.Integer(), nullable=False),

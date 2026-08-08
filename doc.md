@@ -6,7 +6,10 @@
 - [ ] Criar tabela de preços
 - [ ] Criar produtos
 - [ ] Ideia de calculo de varios pagamentos
+- [ ] Tornar card do pagamento em partial html
 
+### Ponto de partida
+- Página payments.html - Tornar partes dela em partiais html
 
 ### Bug
 - Nenhum bug conhecido

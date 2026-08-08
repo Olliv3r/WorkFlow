@@ -14,8 +14,9 @@ export const PaymentUI = {
 
   updateButton(status, date, button) {
     const $button = $(button)
-    const $status = $(".payment_status")
-    const $date = $(".payment_date")
+    const $row = $button.closest("tr")
+    const $status = $row.find(".payment_status")
+    const $date = $row.find(".payment_date")
     
     if (status === "paid") {
       $button

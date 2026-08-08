@@ -25,6 +25,10 @@ class PaymentService:
     @staticmethod
     def payment_create(ids: list[int]):
         productions = production_repository.filter_by_ids(ids).all()
+
+        if not productions:
+            raise NotFoundError("Nenhuma produção encontrada")
+
         start_period = min(p.date for p in productions)
         end_period = max(p.date for p in productions)
 
@@ -63,7 +67,7 @@ class PaymentService:
             payment.payment_date = None
 
         else:
-            raise ValidationError("Status inválido")
+            raise ValidationError("Status inválido de pagamento")
 
         payment_repository.commit()
 

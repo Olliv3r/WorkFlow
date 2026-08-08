@@ -8,8 +8,6 @@ class Product(db.Model):
     __tablename__ = "products"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[Optional[str]] = mapped_column(String(30), unique=True)
-    description: Mapped[Optional[str]] = mapped_column(String(300))
     active: Mapped[bool] = mapped_column(default=True)
 
     family_id: Mapped[int] = mapped_column(

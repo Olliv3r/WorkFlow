@@ -1,8 +1,10 @@
 from app.production import bp
 from flask import render_template, request, url_for, jsonify
 from app.production.services.production_service import ProductionService as ps
-from app.production.dtos.dto import CreateDTO
+from app.production.dtos.production_dto import ProductionCreateDTO
 from app.core.exceptions import NotFoundError, ValidationError
+from datetime import date
+from decimal import Decimal
 
 @bp.route("/", methods=["GET",])
 def index():
@@ -28,13 +30,17 @@ def index():
 
 @bp.route("/create", methods=["POST"])
 def create():
-    dto = CreateDTO.from_form(
-        product_id=request.form.get("product_id"),
-        stage_id=request.form.get("stage_id"),
-        dozens=request.form.get("dozens"),
-        price_per_dozen=request.form.get("price_per_dozen"),
-        date=request.form.get("date"),
-        observation=request.form.get("observation")
+    form = request.form
+    price_per_dozen = Decimal(form["price_per_dozen"])
+    date_format = date.fromisoformat(form["date"])
+  
+    dto = ProductionCreateDTO.from_form(
+        product_id=int(form["product_id"]),
+        stage_id=int(form["stage_id"]),
+        dozens=int(form["dozens"]),
+        price_per_dozen=price_per_dozen,
+        date=date_format,
+        observation=str(form["observation"])
     )
 
     try:

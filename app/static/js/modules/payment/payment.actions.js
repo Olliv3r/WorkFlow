@@ -32,19 +32,20 @@ export const PaymentActions = {
 		
 		try {
 		  response = await PaymentAPI.payment_toggle_status(payment_id)
+      UI.setLoading(button, false)
+
+      const color = response.status === "success" ? "success" : "danger"
+    
+      UI.showAlert("#payment_status", color, response.message)
+  
+      PaymentUI.updateButton(
+        response.payment_status, 
+        response.payment_date, 
+        button
+      )
 
 		} finally {
-			UI.setLoading(button, false)
+			console.log("Status updated")
 		}
-    
-    const color = response.status === "success" ? "success" : "danger"
-    
-    UI.showAlert("#payment_status", color, response.message)
-
-    PaymentUI.updateButton(
-      response.payment_status, 
-      response.payment_date, 
-      button
-    )
 	}
 }

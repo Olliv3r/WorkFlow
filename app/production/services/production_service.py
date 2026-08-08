@@ -57,10 +57,9 @@ class ProductionService:
         if not stage:
             raise NotFoundError("Não existe etapa para este produto")
       
-        total_amount = int(dto.dozens) * float(dto.price_per_dozen)
-        date = datetime.strptime(dto.date, "%Y-%m-%d").date()
+        total_amount = dto.dozens * dto.price_per_dozen
         production = Production(
-            date=date,
+            date=dto.date,
             total_amount=total_amount,
             price_per_dozen=dto.price_per_dozen,
             observation=dto.observation,
