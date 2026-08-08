@@ -1,10 +1,10 @@
-WorkFlow
+# WorkFlow
 
 Sistema web para gerenciamento e acompanhamento de produção, desenvolvido com Flask e SQLAlchemy.
 
 O WorkFlow foi criado para organizar o registro da produção, produtos, materiais, valores e pagamentos em um único sistema, reduzindo controles manuais e facilitando o acompanhamento financeiro da produção.
 
-🚀 Tecnologias
+## 🚀 Tecnologias
 
 - Python
 - Flask
@@ -15,7 +15,7 @@ O WorkFlow foi criado para organizar o registro da produção, produtos, materia
 - Bootstrap
 - JavaScript / jQuery
 
-📋 Funcionalidades
+## 📋 Funcionalidades
 
 Produção
 
@@ -27,7 +27,7 @@ Produção
 - Observações sobre a produção
 - Consulta do histórico de produção
 
-Produtos
+## Produtos
 
 O sistema permite cadastrar produtos a partir de suas características, evitando a necessidade de recriar as mesmas combinações durante o registro da produção.
 
@@ -40,7 +40,7 @@ Os produtos podem ser definidos de acordo com características como:
 - Tipo de taco
 - Outras características específicas
 
-Pagamentos
+## Pagamentos
 
 O WorkFlow também permite organizar os pagamentos com base em períodos de produção.
 
@@ -55,12 +55,13 @@ Um pagamento pode possuir:
 
 O valor do pagamento é baseado nas produções pertencentes ao período selecionado.
 
-🏗️ Arquitetura
+## 🏗️ Arquitetura
 
 O projeto utiliza uma arquitetura organizada em camadas, buscando separar responsabilidades e facilitar a manutenção do código.
 
 Uma visão simplificada:
 
+```html
 Request
    │
    ▼
@@ -77,33 +78,35 @@ SQLAlchemy Models
    │
    ▼
 Database
+```
 
-Responsabilidades
+## Responsabilidades
 
-Routes / Controllers
+Routes / Controllers:
 
 Responsáveis por receber as requisições, validar o fluxo HTTP e retornar as respostas adequadas.
 
-Services
+Services:
 
 Concentram as regras de negócio da aplicação.
 
-Repositories
+Repositories:
 
 Responsáveis pelo acesso aos dados e pelas operações relacionadas ao banco de dados.
 
-Models
+Models:
 
 Representam as entidades persistidas no banco através do SQLAlchemy.
 
-DTOs
+DTOs:
 
 Utilizados para transportar e validar dados entre as diferentes partes da aplicação.
 
-📁 Estrutura
+## 📁 Estrutura
 
 A estrutura do projeto segue uma organização semelhante a:
 
+```bash
 WorkFlow/
 │
 ├── app/
@@ -124,11 +127,12 @@ WorkFlow/
 ├── run.py
 ├── requirements.txt
 └── README.md
-
+```
 A separação por responsabilidade permite localizar mais facilmente onde uma alteração deve ser realizada.
 
 Por exemplo:
 
+```html
 Regra de negócio
       ↓
    Service
@@ -144,31 +148,42 @@ Estrutura da tabela
 Interface
       ↓
 Template / JavaScript
+```
 
-⚙️ Instalação
+## ⚙️ Instalação
 
 Clone o repositório:
 
+```
 git clone https://github.com/Olliv3r/WorkFlow.git
 cd WorkFlow
+```
 
 Crie um ambiente virtual:
 
+```
 python -m venv .venv
+```
 
 Ative o ambiente virtual.
 
 Linux / macOS
 
+```
 source .venv/bin/activate
+```
 
 Windows
 
+```
 .venv\Scripts\activate
+```
 
 Instale as dependências:
 
+```
 pip install -r requirements.txt
+```
 
 Configure as variáveis de ambiente necessárias para o projeto.
 
@@ -176,9 +191,11 @@ Depois, inicialize o banco de dados/migrações conforme a configuração do pro
 
 Execute a aplicação:
 
+```
 flask run
+```
 
-🗄️ Banco de dados
+## 🗄️ Banco de dados
 
 O projeto utiliza SQLAlchemy como ORM.
 
@@ -187,14 +204,16 @@ Durante o desenvolvimento, o banco utilizado é o SQLite.
 As alterações estruturais do banco são controladas através de migrations com Alembic/Flask-Migrate.
 
 Exemplo:
-
+```bash
 flask db migrate -m "description"
 flask db upgrade
+```
 
-🔄 Fluxo de produção
+## 🔄 Fluxo de produção
 
 O fluxo principal do sistema pode ser representado da seguinte maneira:
 
+```html
 Produto
    │
    ▼
@@ -217,10 +236,11 @@ Período de pagamento
    │
    ▼
 Total a receber
+```
 
 Isso permite que as produções sejam registradas individualmente e posteriormente agrupadas em um período para pagamento.
 
-🎯 Objetivo do projeto
+## 🎯 Objetivo do projeto
 
 O principal objetivo do WorkFlow é transformar um processo que depende de anotações e cálculos manuais em um sistema organizado, confiável e fácil de utilizar.
 
@@ -237,7 +257,7 @@ Além de resolver o problema específico para o qual foi desenvolvido, o projeto
 - Desenvolvimento de interfaces web
 - JavaScript para interações dinâmicas
 
-📌 Status
+## 📌 Status
 
 🚧 Em desenvolvimento
 
