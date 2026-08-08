@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    {% block head %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ficha - {{ title }}</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+
+    {{ bootstrap.load_css() }}
+
+    {% block extra_css %}{% endblock %}
+    {% endblock %}
+  </head>
+  <body>
+    {% include "sidebar.html" %}
+    <div class="app-main">
+      {% block content %}{% endblock %}
+    </div>
+
+    {{ bootstrap.load_js() }}
+
+    <script src="{{ url_for('static', filename='js/libs/jquery-3.7.1.min.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+  </body>
+</html>

@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #F7F5F0;
+  --panel: #FFFFFF;
+  --ink: #2A2620;
+  --ink-soft: #6B6459;
+  --border: #E4DFD3;
+
+  --wood: #8B5A2B;
+  --wood-soft: #F0E4D4;
+  --fiber: #4A5D3A;
+  --fiber-soft: #E7ECE1;
+  --settle: #2F6B5E;
+  --settle-soft: #E3EEEC;
+
+  --sidebar-width: 240px;
+}
+
+/* ===== Estado do toggle (checkbox invisível) ===== */
+.sidebar-toggle-state {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ===== Botão hambúrguer — só existe em mobile ===== */
+.sidebar-hamburger {
+  display: none;
+  position: fixed;
+  top: 0.85rem;
+  left: 1rem;
+  z-index: 40;
+  width: 40px;
+  height: 40px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(42, 38, 32, 0.08);
+}
+
+/* ===== Overlay ===== */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(42, 38, 32, 0.35);
+  z-index: 30;
+  cursor: pointer;
+}
+
+/* ===== Sidebar ===== */
+.app-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+  z-index: 35;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0 0.5rem 1.5rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-brand-text {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.sidebar-section-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-soft);
+  padding: 1rem 0.5rem 0.5rem;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.65rem;
+  border-radius: 8px;
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  margin-bottom: 0.15rem;
+  border-left: 3px solid transparent;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.sidebar-link i { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
+
+.sidebar-link:hover {
+  background: #F0EDE6;
+  color: var(--ink);
+}
+
+/* Acento de cor por seção, herdado das páginas que representam */
+.sidebar-link.accent-wood.active {
+  background: var(--wood-soft);
+  color: var(--wood);
+  border-left-color: var(--wood);
+  font-weight: 600;
+}
+.sidebar-link.accent-settle.active {
+  background: var(--settle-soft);
+  color: var(--settle);
+  border-left-color: var(--settle);
+  font-weight: 600;
+}
+.sidebar-link.accent-fiber:hover {
+  background: var(--fiber-soft);
+  color: var(--fiber);
+}
+
+/* ===== Conteúdo principal — empurrado pela sidebar em desktop ===== */
+.app-main {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+}
+
+/* ===== Mobile: sidebar vira drawer com hambúrguer ===== */
+@media (max-width: 900px) {
+  .sidebar-hamburger {
+    display: flex;
+  }
+
+  .app-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 4px 0 24px rgba(42, 38, 32, 0.15);
+    padding-top: 4rem;
+    /*
+      Sem isto, a <nav> (z-index 35, maior que o overlay em 30)
+      intercepta cliques em qualquer pixel dela mesma — inclusive
+      espaço vazio sem link nenhum — impedindo o overlay de fechar
+      o menu ali. pointer-events:none tira a nav da jogada por
+      padrão; cada link/label dentro dela reativa pointer-events
+      individualmente logo abaixo, então eles continuam clicáveis
+      normalmente. Only reproduzível em teste automatizado sem
+      "force" — no clique manual de um dedo/mouse o efeito é o
+      mesmo: tocar no vazio da nav aberta não fecha o menu sem isto.
+    */
+    pointer-events: none;
+  }
+
+  .app-sidebar a,
+  .app-sidebar label {
+    pointer-events: auto;
+  }
+
+  .app-main {
+    margin-left: 0;
+    padding-top: 3.75rem;
+  }
+
+  /* Checkbox marcado -> abre o drawer e o overlay */
+  .sidebar-toggle-state:checked ~ .app-sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-toggle-state:checked ~ .sidebar-overlay {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar { transition: none; }
+}

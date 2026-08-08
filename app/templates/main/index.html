@@ -1,0 +1,196 @@
+{% from "bootstrap5/utils.html" import render_messages %}
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5" style="max-width: 880px;">
+
+  <div class="sheet-header">Ficha de Produção</div>
+  <div class="sheet-sub">Registro de etapas de fabricação e cadastro de novos produtos</div>
+
+  <ul class="nav sector-tabs" id="productTabs" role="tablist">
+    <li class="nav-item flex-fill" role="presentation">
+      <button
+        class="sector-tab active"
+        data-sector="production"
+        data-bs-toggle="tab"
+        data-bs-target="#production-tab"
+        type="button"
+        role="tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        Produção
+      </button>
+    </li>
+    <li class="nav-item flex-fill" role="presentation">
+      <button
+        class="sector-tab"
+        data-sector="product"
+        data-bs-toggle="tab"
+        data-bs-target="#product-tab"
+        type="button"
+        role="tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg>
+        Novo Produto
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+
+    <!-- =========================
+         FORM PRODUÇÃO
+    ========================== -->
+    <div class="tab-pane fade show active sector-panel" data-sector-panel="production" id="production-tab" role="tabpanel">
+
+      <span class="sector-pill wood">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+        Registro de etapa
+      </span>
+
+      <div class="mx-1">
+	{{ render_messages() }}
+      </div>
+
+      <form method="POST" method="post" action="{{ url_for('main.production_create') }}">
+        <div class="row g-3">
+
+          <!-- Produto -->
+          <div class="col-md-6">
+            <label class="field-label">Produto<span class="req">*</span></label>
+            <select class="form-select" name="product_id" required>
+              <option value="" selected disabled>Selecionar produto</option>
+              {% for product in products %}
+              <option value="{{ product.id }}">
+                {{ product.family.name }} - {{ product.material.name }} - {{ product.hole.quantity }} furos
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Etapa -->
+          <div class="col-md-6">
+            <label class="field-label">Etapa<span class="req">*</span></label>
+            <select class="form-select" name="stage_id" required>
+              <option value="" selected disabled>Selecionar etapa</option>
+              {% for stage in stages %}
+              <option value="{{ stage.id }}">{{ stage.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Quantidade -->
+          <div class="col-md-4">
+            <label class="field-label">Dúzias<span class="req">*</span></label>
+            <input type="number" class="form-control" name="dozens" min="1" required>
+          </div>
+
+	  <!-- Valor por dúzia -->
+          <div class="col-md-4">
+            <label class="field-label">Valor por dúzia<span class="req">*</span></label>
+            <input type="number" class="form-control" name="price_per_dozen" min="1" required>
+          </div>
+
+          <!-- Data -->
+          <div class="col-md-4">
+            <label class="field-label">Data<span class="req">*</span></label>
+            <input type="date" class="form-control" name="date" required>
+          </div>
+
+          <!-- Observação -->
+          <div class="col-md-12">
+            <label class="field-label">Observação</label>
+            <textarea class="form-control" rows="3" name="observation"></textarea>
+          </div>
+
+          <div class="col-12 pt-2">
+            <button class="btn btn-wood">Salvar Produção</button>
+          </div>
+
+        </div>
+      </form>
+
+    </div>
+
+    <!-- =========================
+         FORM PRODUTO
+    ========================== -->
+    <div class="tab-pane fade sector-panel" data-sector-panel="product" id="product-tab" role="tabpanel">
+
+      <span class="sector-pill fiber">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+        Cadastro de produto
+      </span>
+
+      <form method="POST">
+        <div class="row g-3">
+
+          <!-- Família -->
+          <div class="col-md-6">
+            <label class="field-label">Família<span class="req">*</span></label>
+            <select class="form-select" name="family_id" required>
+              <option value="" selected disabled>Selecionar família</option>
+              {% for family in families %}
+              <option value="{{ family.id }}">{{ family.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Material -->
+          <div class="col-md-6">
+            <label class="field-label">Material<span class="req">*</span></label>
+            <select class="form-select" name="material_id" required>
+              <option value="" selected disabled>Selecionar material</option>
+              {% for material in materials %}
+              <option value="{{ material.id }}">{{ material.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Furos -->
+          <div class="col-md-4">
+            <label class="field-label">Furos<span class="req">*</span></label>
+            <select class="form-select" name="hole_id" required>
+              <option value="" selected disabled>Selecionar</option>
+              {% for hole in holes %}
+              <option value="{{ hole.id }}">{{ hole.quantity }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Taco -->
+          <div class="col-md-4">
+            <label class="field-label">Taco<span class="req">*</span></label>
+            <select class="form-select" name="stick_type_id" required>
+              <option value="" selected disabled>Selecionar</option>
+              {% for stick in sticks %}
+              <option value="{{ stick.id }}">{{ stick.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Qualidade -->
+          <div class="col-md-4">
+            <label class="field-label">Qualidade</label>
+            <select class="form-select" name="quality_id">
+              <option value="" selected>Sem qualidade</option>
+              {% for quality in qualities %}
+              <option value="{{ quality.id }}">{{ quality.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-12 pt-2">
+            <button class="btn btn-fiber">Criar Produto</button>
+          </div>
+
+        </div>
+      </form>
+
+    </div>
+
+  </div>
+
+
+</div>
+{% endblock %}

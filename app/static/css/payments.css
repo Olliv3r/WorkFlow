@@ -1,0 +1,430 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Base herdada do sistema (madeira/fibra) */
+  --bg: #F7F5F0;
+  --panel: #FFFFFF;
+  --ink: #2A2620;
+  --ink-soft: #6B6459;
+  --border: #E4DFD3;
+
+  --wood: #8B5A2B;
+  --wood-soft: #F0E4D4;
+  --fiber: #4A5D3A;
+  --fiber-soft: #E7ECE1;
+
+  /* Acento próprio desta tela: fechamento / conferência */
+  --settle: #2F6B5E;
+  --settle-dark: #24544A;
+  --settle-soft: #E3EEEC;
+
+  --danger: #B54545;
+  --shadow-sm: 0 1px 2px rgba(42, 38, 32, 0.06);
+  --shadow-md: 0 4px 16px rgba(42, 38, 32, 0.07);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.page-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+/* ===== Cabeçalho ===== */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 2rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 0.35rem;
+}
+
+.page-sub {
+  color: var(--ink-soft);
+  font-size: 0.925rem;
+  max-width: 46ch;
+  margin: 0;
+}
+
+.btn-settle {
+  background: var(--settle);
+  border-color: var(--settle);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.65rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+.btn-settle:hover { background: var(--settle-dark); border-color: var(--settle-dark); color: #fff; }
+.btn-settle:focus-visible { box-shadow: 0 0 0 3px rgba(47, 107, 94, 0.3); outline: none; }
+
+/* ===== Cards genéricos ===== */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.panel-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panel-title i { color: var(--settle); font-size: 1.05rem; }
+
+/* ===== Filtro ===== */
+.field-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.form-select, .form-control {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+  background-color: #FCFBF9;
+}
+
+.form-select:focus, .form-control:focus {
+  border-color: var(--settle);
+  box-shadow: 0 0 0 3px rgba(47, 107, 94, 0.15);
+}
+
+.btn-filter-primary {
+  background: var(--settle);
+  border-color: var(--settle);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.55rem 1.35rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+.btn-filter-primary:hover { background: var(--settle-dark); border-color: var(--settle-dark); color: #fff; }
+
+.btn-filter-clear {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ink-soft);
+  font-weight: 500;
+  padding: 0.55rem 1.35rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+.btn-filter-clear:hover { background: #F0EDE6; color: var(--ink); }
+
+/* ===== Stat cards (resumo) ===== */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--settle);
+  border-radius: 10px;
+  padding: 1.15rem 1.35rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-card .stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--settle-soft);
+  color: var(--settle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  margin-bottom: 0.15rem;
+}
+
+.stat-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.55rem;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+/* ===== Tabela de produções ===== */
+.table-productions {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
+}
+
+.table-productions thead th {
+  background: #FAF8F4;
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table-productions tbody td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  color: var(--ink);
+}
+
+.table-productions tbody tr:nth-child(even) {
+  background: #FBFAF7;
+}
+
+.table-productions tbody tr:hover {
+  background: var(--settle-soft);
+  transition: background 0.12s ease;
+}
+
+.table-productions tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-productions .form-check-input:checked {
+  background-color: var(--settle);
+  border-color: var(--settle);
+}
+
+.table-productions .form-check-input:focus {
+  box-shadow: 0 0 0 3px rgba(47, 107, 94, 0.2);
+}
+
+.cell-total {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.stage-badge {
+  background: var(--fiber-soft);
+  color: var(--fiber);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.6rem;
+  border-radius: 100px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  position: relative;
+  background:
+    linear-gradient(to right, var(--panel) 30%, rgba(255,255,255,0)),
+    linear-gradient(to right, rgba(255,255,255,0), var(--panel) 70%) 100% 0,
+    linear-gradient(to right, rgba(42,38,32,0.08), rgba(255,255,255,0) 12px),
+    linear-gradient(to left, rgba(42,38,32,0.08), rgba(255,255,255,0) 12px) 100% 0;
+  background-repeat: no-repeat;
+  background-size: 40px 100%, 40px 100%, 12px 100%, 12px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+
+/* ===== Card de fechamento ===== */
+.settle-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 0.9rem;
+}
+.settle-summary-row:last-of-type { border-bottom: none; }
+
+.settle-summary-row .label { color: var(--ink-soft); }
+.settle-summary-row .value { font-weight: 600; color: var(--ink); }
+.settle-summary-row.total .value {
+  font-family: 'Fraunces', serif;
+  font-size: 1.35rem;
+  color: var(--settle);
+}
+
+.btn-create-payment {
+  background: var(--settle);
+  border-color: var(--settle);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: 8px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.btn-create-payment:hover { background: var(--settle-dark); border-color: var(--settle-dark); color: #fff; }
+.btn-create-payment:disabled {
+  background: #C9C3B6;
+  border-color: #C9C3B6;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+/* ===== Histórico ===== */
+.table-history thead th {
+  background: #FAF8F4;
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.table-history tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  font-size: 0.875rem;
+}
+
+.table-history tbody tr:hover { background: #FBFAF7; }
+
+.badge-paid {
+  background: var(--fiber-soft);
+  color: var(--fiber);
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.badge-pending {
+  background: var(--wood-soft);
+  color: var(--wood);
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/*
+  Botão único que alterna conforme payment.status.
+  is-pending = ação "Marcar como Pago" (confirmação, cor settle,
+  igual acento do botão "Criar Pagamento" — mesma família de ação).
+  is-paid = ação "Reverter p/ Pendente" (correção/desfazer,
+  deliberadamente mais discreto — não deveria convidar clique
+  tão fácil quanto a ação de confirmar).
+*/
+.btn-toggle-status {
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.btn-toggle-status.is-pending {
+  background: var(--settle);
+  border-color: var(--settle);
+  color: #fff;
+}
+.btn-toggle-status.is-pending:hover {
+  background: var(--settle-dark);
+  border-color: var(--settle-dark);
+  color: #fff;
+}
+
+.btn-toggle-status.is-paid {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--ink-soft);
+}
+.btn-toggle-status.is-paid:hover {
+  background: #F0EDE6;
+  color: var(--ink);
+  border-color: var(--ink-soft);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--ink-soft);
+}
+.empty-state i { font-size: 1.75rem; margin-bottom: 0.5rem; display: block; color: var(--border); }
+
+/* ===== Responsivo ===== */
+@media (max-width: 900px) {
+  .stat-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .page-wrap { padding: 1.5rem 1rem 3rem; }
+  .page-header { flex-direction: column; }
+  .btn-settle { width: 100%; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table-productions tbody tr { transition: none; }
+}
