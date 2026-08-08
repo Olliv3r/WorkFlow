@@ -1,0 +1,5 @@
+./dev.db
+./server.sh
+./test.py
+./migrations/
+.env*
