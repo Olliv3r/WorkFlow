@@ -3,10 +3,24 @@ import { PaymentUI } from "./payment.ui.js"
 import { UI } from "../core/ui.js"
 
 export const PaymentActions = {
+  // Carregar historico
+  async handleHistoryPartial() {
+    try {
+      const response = await PaymentAPI.fetch_history_partial()
+      
+      PaymentUI.replaceHtml("#table-history", response)
+      
+    } finally {
+      console.log("Partial de histórico carregado")
+    }
+  },
+
+  // Calcular produções
   handleUpdateSummary() {
     PaymentUI.updateSummary()
   },
 
+  // Criar pagamento
 	async handlePaymentCreate(formData) {
 		UI.setLoading("#formPaymentCreate #btnCreate", true)
 	
@@ -14,6 +28,7 @@ export const PaymentActions = {
 			const response = await PaymentAPI.payment_create(formData)
 
 			if (response.status === "success") {
+        this.handleHistoryPartial()
 				UI.reset("#formPaymentCreate")
 			}
 

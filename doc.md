@@ -1,4 +1,4 @@
-### Ponto de partida
+### Estado atual
 - [ ] Filtrar produções
 - [x] Criar pagamento
 - [x] Alterar estado do pagamento
@@ -6,7 +6,7 @@
 - [ ] Criar tabela de preços
 - [ ] Criar produtos
 - [ ] Ideia de calculo de varios pagamentos
-- [ ] Tornar card do pagamento em partial html
+- [ ] Tornar cards do pagamento em partiais html
 
 ### Ponto de partida
 - Página payments.html - Tornar partes dela em partiais html

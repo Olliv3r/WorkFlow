@@ -231,76 +231,13 @@
   {% endif %}
 
   <!-- ========== HISTÓRICO ========== -->
-  <div class="panel mt-4">
+  <div class="history panel mt-4">
     <div class="d-none" id="payment_status"></div>
     <div class="panel-title">
       <i class="bi bi-clock-history"></i> Histórico de Pagamentos
     </div>
 
-    {% if payments %}
-    <div class="table-scroll">
-      <table class="table-history">
-        <thead>
-          <tr>
-            <th>Período</th>
-            <th>Produções</th>
-            <th>Valor Total</th>
-            <th>Data do Pagamento</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for payment in payments %}
-          <tr>
-            <td>
-              {{ payment.start_period.strftime('%d/%m/%Y') if
-              payment.start_period else '-' }} a {{
-              payment.end_period.strftime('%d/%m/%Y') if payment.end_period else
-              '-' }}
-            </td>
-            <td>{{ payment.productions|length }}</td>
-            <td class="cell-total">
-              R$ {{ "%.2f"|format(payment.total_amount)|replace('.', ',') }}
-            </td>
-            <td class="payment_date">
-              {{ payment.payment_date.strftime('%d/%m/%Y') if
-              payment.payment_date else '-' }}
-            </td>
-            <td class="payment_status">
-              {% if payment.status == 'paid' %}
-              <span class="badge-paid"
-                ><i class="bi bi-check-circle-fill"></i> Pago</span
-              >
-              {% elif payment.status == 'pending' %}
-              <span class="badge-pending"
-                ><i class="bi bi-hourglass-split"></i> Pendente</span
-              >
-              {% else %}
-              <span class="badge-pending">{{ payment.status }}</span>
-              {% endif %}
-            </td>
-            <td>
-              <button data-payment-id="{{ payment.id }}" type="button" class="btn-toggle-status {% if payment.status == 'paid' %}is-paid{% else %}is-pending{% endif %}">
-                {% if payment.status == 'paid' %}
-                <i class="bi bi-arrow-counterclockwise"></i>
-                <span class="status_text">Reverter p/ Pendente</span> 
-                {% else %}
-                <i class="bi bi-check2-circle"></i> <span class="status_text">Marcar como Pago</span> 
-                {% endif %}
-              </button>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% else %}
-    <div class="empty-state">
-      <i class="bi bi-archive"></i>
-      <p class="mb-0">Nenhum pagamento realizado ainda.</p>
-    </div>
-    {% endif %}
+    <div id="table-history"></div>
   </div>
 </div>
 {% endblock %} {% block extra_scripts %}

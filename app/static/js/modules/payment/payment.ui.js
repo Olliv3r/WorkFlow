@@ -58,4 +58,8 @@ export const PaymentUI = {
 
     $date.text(date === null ? "-" : date)
   },
+
+  replaceHtml(containerEl, content) {
+    $(containerEl).html(content)
+  }
 };

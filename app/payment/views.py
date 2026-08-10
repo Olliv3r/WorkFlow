@@ -4,15 +4,10 @@ from app.payment.services.payment_service import PaymentService as ps
 from app.core.exceptions import NotFoundError, ValidationError
 
 
-@bp.route(
-    "/",
-    methods=[
-        "GET",
-    ],
-)
+@bp.route("/", methods=["GET"])
 def index():
     productions = ps.get_productions()
-    payments = ps.get_payments()
+    #payments = ps.get_payments()
     total_dozens, total_amount = ps.get_unpaid_summary()
     start_period, end_period = ps.get_period()
 
@@ -20,13 +15,22 @@ def index():
         "payment/payments.html",
         title="Pagamentos",
         productions=productions,
-        payments=payments,
+        #payments=payments,
         start_period=start_period,
         end_period=end_period,
         total_dozens=total_dozens,
         total_amount=total_amount,
     )
 
+@bp.route("/history/partial", methods=["GET"])
+def history_partial():
+    payments = ps.get_payments()
+    return jsonify(
+        render_template(
+            "payment/_history_table.html",
+            payments=payments
+        )
+    )
 
 @bp.route("/create", methods=["GET", "POST"])
 def create():

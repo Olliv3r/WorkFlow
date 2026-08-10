@@ -1,8 +1,11 @@
 import { PaymentActions } from "./payment.actions.js"
 
 $(document).ready(function() {
+  // Carregar historico e calculo da produção
+  PaymentActions.handleHistoryPartial()
   PaymentActions.handleUpdateSummary()
 
+  // Calcular produção
   $(".form-check-input").on(
     "change", 
     function() {
@@ -10,6 +13,7 @@ $(document).ready(function() {
     }
   )
 
+  // Criar pagamento
 	$("#formPaymentCreate").on(
     "submit", 
     function(event) {
@@ -20,8 +24,9 @@ $(document).ready(function() {
   )
 
   // Atualizar o status de pagamento
-	$(".btn-toggle-status").on(
-    "click",
+	$("#table-history").on(
+    "click", 
+    ".btn-toggle-status",
     function(event) {
 	    event.preventDefault()
 	    const paymentId = $(this).data("payment-id")
