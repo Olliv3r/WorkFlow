@@ -28,7 +28,7 @@
 
 export FLASK_APP=main  # Ponto de entrada (editável)
 
-VENV=~/venv-se/bin     # Ambiente virtual python (editável)
+VENV=~/venv-wf/bin     # Ambiente virtual python (editável)
 DB="dev.db"                 # Arquivo SQLITE (editável)
 DIR_SEED="app/seed/seed.py" # Arquivo que popula o banco (editável)
 
