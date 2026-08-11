@@ -4,6 +4,8 @@ Sistema web para gerenciamento e acompanhamento de produção, desenvolvido com 
 
 O WorkFlow foi criado para organizar o registro da produção, produtos, materiais, valores e pagamentos em um único sistema, reduzindo controles manuais e facilitando o acompanhamento financeiro da produção.
 
+![WorkFlow — Preview do sistema](assets/preview.png)
+
 ## 🚀 Tecnologias
 
 - Python
