@@ -1,26 +1,40 @@
 import { PaymentActions } from "./payment.actions.js"
 
 $(document).ready(function() {
-  // Carregar historico e calculo da produção
+  // Carregar cards, historico e calculo da produção
+  PaymentActions.handleCardsPartial()
   PaymentActions.handleHistoryPartial()
   PaymentActions.handleUpdateSummary()
 
   // Calcular produção
-  $(".form-check-input").on(
+  $("#cards").on(
     "change", 
+    ".form-check-input",
     function() {
       PaymentActions.handleUpdateSummary()
     }
   )
 
   // Criar pagamento
-	$("#formPaymentCreate").on(
+	$("#cards").on(
     "submit", 
+    "#formPaymentCreate", 
     function(event) {
   		event.preventDefault()
   		const formData = new FormData(this)
   		PaymentActions.handlePaymentCreate(formData)
   	}
+  )
+
+  // Excluir um pagamento
+  $("#table-history").on(
+    "click",
+    ".btn-delete-payment",
+    function(event) {
+      event.preventDefault()
+      const paymentId = $(this).data("payment-id")
+      PaymentActions.handlePaymentDelete(paymentId, this)
+    }
   )
 
   // Atualizar o status de pagamento

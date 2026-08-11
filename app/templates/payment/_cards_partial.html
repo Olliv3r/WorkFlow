@@ -1,0 +1,169 @@
+{% if productions %}
+  <!-- ========== RESUMO ========== -->
+  {% for production in productions %}
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-icon"><i class="bi bi-clipboard-data"></i></div>
+      <div>
+        <div class="stat-label">Produções</div>
+        <div class="stat-value">{{ productions|length }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+      <div>
+        <div class="stat-label">Dúzias</div>
+        <div class="stat-value">{{ production.dozens }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+      <div>
+        <div class="stat-label">Total</div>
+        <div class="stat-value">
+          R$ {{ "%.2f"|format(production.total_amount)|replace('.', ',') }}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="row g-4">
+    <!-- ========== TABELA DE PRODUÇÕES ========== -->
+    <div class="col-lg-8">
+      <div class="panel">
+        <div class="panel-title">
+          <i class="bi bi-table"></i> Produções do período
+        </div>
+
+        <div class="table-scroll">
+          <table class="table-productions">
+            <thead>
+              <tr>
+                <th style="width: 36px"></th>
+                <th>Data</th>
+                <th>Produto</th>
+                <th>Etapa</th>
+                <th>Dúzias</th>
+                <th>Valor/dúzia</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for production in productions %}
+              <tr>
+                <td>
+                  <input
+                    data-dozens="{{ production.dozens }}"
+                    data-amount="{{ production.total_amount }}"
+                    class="form-check-input"
+                    type="checkbox"
+                    name="production_ids"
+                    value="{{ production.id }}"
+                    form="formPaymentCreate"
+                    checked
+                  />
+                </td>
+                <td>{{ production.date.strftime('%d/%m/%Y') }}</td>
+                <td>
+                  {{ production.product.family.name }} — {{
+                  production.product.material.name }}
+                </td>
+                <td>
+                  <span class="stage-badge">{{ production.stage.name }}</span>
+                </td>
+                <td>{{ production.dozens }}</td>
+                <td>
+                  R$ {{ "%.2f"|format(production.price_per_dozen)|replace('.',
+                  ',') }}
+                </td>
+                <td class="cell-total">
+                  R$ {{ "%.2f"|format(production.total_amount)|replace('.', ',')
+                  }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== CARD LATERAL: RESUMO DO PAGAMENTO ========== -->
+    <div class="col-lg-4">
+      <div class="panel">
+        <div class="panel-title">
+          <i class="bi bi-receipt"></i> Resumo do Pagamento
+        </div>
+        <div id="payment_alert" class="d-none"></div>
+
+        {# TODO: trocar '#' pela rota real, ex: {{
+        url_for('main.create_payment') }} #}
+        <form
+          method="POST"
+          action="{{url_for('payment.create') }}"
+          id="formPaymentCreate"
+        >
+          <div class="settle-summary-row">
+            <span class="label">Período</span>
+            <span class="value">
+              {{ request.args.get('start_date', '—') }} a {{
+              request.args.get('end_date', '—') }}
+            </span>
+          </div>
+          <div class="settle-summary-row">
+            <span class="label">Produções</span>
+            <span class="value">{{ productions|length }}</span>
+          </div>
+          <div class="settle-summary-row">
+            <span class="label">Dúzias</span>
+            <span class="value" id="total_dozens">{{ total_dozens }}</span>
+          </div>
+          <div class="settle-summary-row total">
+            <span class="label">Valor total</span>
+            <span class="value" id="total_amount"
+              >R$ {{ "%.2f"|format(total_amount)|replace('.', ',') }}</span
+            >
+          </div>
+
+          <div class="mt-3 mb-3">
+            <label class="field-label">Observação</label>
+            <textarea
+              class="form-control"
+              name="observation"
+              rows="3"
+              placeholder="Opcional"
+            ></textarea>
+          </div>
+
+          <input
+            type="hidden"
+            name="start_date"
+            value="{{ request.args.get('start_date', '') }}"
+          />
+          <input
+            type="hidden"
+            name="end_date"
+            value="{{ request.args.get('end_date', '') }}"
+          />
+
+          <button id="btnCreate" type="submit" class="btn btn-create-payment">
+            <i class="bi bi-check-circle"></i> Criar Pagamento
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+
+  <div class="panel">
+    <div class="empty-state">
+      <i class="bi bi-inbox"></i>
+      <p class="mb-0">
+        Nenhuma produção pendente encontrada para este período.<br />Ajuste as
+        datas e busque novamente.
+      </p>
+    </div>
+  </div>
+{% endif %}

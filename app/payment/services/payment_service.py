@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from app.core.exceptions import NotFoundError, ValidationError
+from app.core.exceptions import NotFoundError, ValidationError, PermissionError
 from app.payment.repositories import *
 from app.models import Payment
 
@@ -22,6 +22,7 @@ class PaymentService:
   
         return result.start_period, result.end_period
 
+    # Criar pagamento
     @staticmethod
     def payment_create(ids: list[int]):
         productions = production_repository.filter_by_ids(ids).all()
@@ -51,6 +52,26 @@ class PaymentService:
 
         return payment
 
+    # Excluir pagamento
+    @staticmethod
+    def payment_delete(payment_id: int) -> bool:
+        payment = payment_repository.filter_by(id=payment_id).first()
+
+        if payment is None:
+            raise NotFoundError("Pagamento não encontrado")
+
+        if payment.status != "pending" or payment.status == "paid":
+            raise PermissionError("Não é possível excluir um pagamento já pago")
+
+        for production in payment.productions:
+            production.payment_id = None
+
+        payment_repository.delete(payment)
+        payment_repository.commit()
+      
+        return True
+
+    # Atualizar o status do pagamento
     @staticmethod
     def toggle_status(payment_id: int):
         payment = payment_repository.filter_by(id=payment_id).first()

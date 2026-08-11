@@ -31,5 +31,5 @@ class CommonRepository:
     def commit(self):
         self.session.commit()
 
-    def remove(self, instance):
+    def delete(self, instance):
         self.session.delete(instance)

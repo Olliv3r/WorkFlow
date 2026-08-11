@@ -6,10 +6,11 @@
 - [ ] Criar tabela de preços
 - [ ] Criar produtos
 - [ ] Ideia de calculo de varios pagamentos
-- [ ] Tornar cards do pagamento em partiais html
+- [x] Tornar cards do pagamento em partiais html
+- [ ] Página para gerenciar as produções
 
 ### Ponto de partida
-- Página payments.html - Tornar partes dela em partiais html
+- Implementar outra página para listar todos as produções e gerenciá-las - isso evita que o as produções e resumo na página de pagamentos vire lixos.
 
 ### Bug
 - Nenhum bug conhecido
