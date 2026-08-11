@@ -1,35 +1,42 @@
 {% if productions %}
-  <!-- ========== RESUMO ========== -->
-  {% for production in productions %}
+  <!-- RESUMO -->
   <div class="stat-row">
     <div class="stat-card">
-      <div class="stat-icon"><i class="bi bi-clipboard-data"></i></div>
+      <div class="stat-icon">
+        <i class="bi bi-clipboard-data"></i>
+      </div>
       <div>
         <div class="stat-label">Produções</div>
         <div class="stat-value">{{ productions|length }}</div>
       </div>
     </div>
+    
     <div class="stat-card">
-      <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+      <div class="stat-icon">
+        <i class="bi bi-box-seam"></i>
+      </div>
       <div>
         <div class="stat-label">Dúzias</div>
-        <div class="stat-value">{{ production.dozens }}</div>
+        <div class="stat-value">{{ total_dozens }}</div>
+        
       </div>
     </div>
+    
     <div class="stat-card">
-      <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+      <div class="stat-icon">
+        <i class="bi bi-cash-stack"></i>
+      </div>
       <div>
         <div class="stat-label">Total</div>
         <div class="stat-value">
-          R$ {{ "%.2f"|format(production.total_amount)|replace('.', ',') }}
+          R$ {{ "%.2f"|format(total_amount)|replace('.', ',') }}
         </div>
       </div>
     </div>
   </div>
-  {% endfor %}
 
+  <!-- ========== TABELA DE PRODUÇÕES ========== -->
   <div class="row g-4">
-    <!-- ========== TABELA DE PRODUÇÕES ========== -->
     <div class="col-lg-8">
       <div class="panel">
         <div class="panel-title">
@@ -89,7 +96,7 @@
       </div>
     </div>
 
-    <!-- ========== CARD LATERAL: RESUMO DO PAGAMENTO ========== -->
+    <!-- CARD LATERAL: RESUMO DO PAGAMENTO -->
     <div class="col-lg-4">
       <div class="panel">
         <div class="panel-title">
@@ -97,8 +104,6 @@
         </div>
         <div id="payment_alert" class="d-none"></div>
 
-        {# TODO: trocar '#' pela rota real, ex: {{
-        url_for('main.create_payment') }} #}
         <form
           method="POST"
           action="{{url_for('payment.create') }}"
@@ -107,8 +112,7 @@
           <div class="settle-summary-row">
             <span class="label">Período</span>
             <span class="value">
-              {{ request.args.get('start_date', '—') }} a {{
-              request.args.get('end_date', '—') }}
+              {{ start_period|default('—') }} a {{ end_period|default('—') }}
             </span>
           </div>
           <div class="settle-summary-row">

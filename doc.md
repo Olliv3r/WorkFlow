@@ -10,7 +10,8 @@
 - [ ] Página para gerenciar as produções
 
 ### Ponto de partida
-- Implementar outra página para listar todos as produções e gerenciá-las - isso evita que o as produções e resumo na página de pagamentos vire lixos.
+- Implementar outra página para listar todos as produções e gerenciá-las - isso evita que o as produções e resumo na página de pagamentos virem lixos.
 
 ### Bug
 - Nenhum bug conhecido
+

@@ -5,13 +5,9 @@ from app.core.exceptions import NotFoundError, ValidationError, PermissionError
 
 @bp.route("/", methods=["GET"])
 def index():
-    #start_period, end_period = ps.get_period()
-
     return render_template(
         "payment/payments.html",
-        title="Pagamentos",
-        # start_period=start_period,
-        # end_period=end_period
+        title="Pagamentos"
     )
 
 # Renderizar cards
@@ -19,13 +15,16 @@ def index():
 def cards_partial():
     productions = ps.get_productions()
     total_dozens, total_amount = ps.get_unpaid_summary()
+    start_period, end_period = ps.get_period()
   
     return jsonify(
         render_template(
             "payment/_cards_partial.html",
             productions=productions,
             total_dozens=total_dozens,
-            total_amount=total_amount
+            total_amount=total_amount,
+            start_period=start_period,
+            end_period=end_period
         )
     )
 
