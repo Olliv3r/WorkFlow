@@ -1,11 +1,31 @@
 import { ProductionActions } from "./production.actions.js"
 
 $(document).ready(function() {
-	$("#formProductionAdd").on("submit", function(event) {
-		event.preventDefault()
+  // Carregar partial de cards e tabela
+  ProductionActions.handleLoadCardsPartial()
+  ProductionActions.handleLoadTablePartial()
 
-		const formData = new FormData(this)
+  // Criar produção
+	$("#formNewProduction").on(
+    "submit", 
+    function(event) {
+      event.preventDefault()
 
-		ProductionActions.handleProductionCreate(formData)
-	})
+		  const formData = new FormData(this)
+        ProductionActions.handleProductionCreate(formData)
+	  }
+  )
+
+  // Preencher dados de produção na modal
+  $("#production-table").on(
+    "click",
+    ".btn-icon-action",
+    function(event) {
+      event.preventDefault()
+
+      const productionId = $(this).data("production-id")
+      ProductionActions.handleOptions(productionId)
+      //ProductionActions.handleGetData(productionId)
+    }
+  )
 })

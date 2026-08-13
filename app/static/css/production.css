@@ -1,0 +1,412 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Base compartilhada do sistema (mesmas variáveis de payments.css —
+     duplicadas de propósito aqui para este arquivo funcionar sozinho,
+     sem exigir payments.css carregado junto). */
+  --bg: #F7F5F0;
+  --panel: #FFFFFF;
+  --ink: #2A2620;
+  --ink-soft: #6B6459;
+  --border: #E4DFD3;
+
+  --wood: #8B5A2B;
+  --wood-soft: #F0E4D4;
+  --wood-dark: #74491F;
+  --fiber: #4A5D3A;
+  --fiber-soft: #E7ECE1;
+
+  --danger: #B54545;
+  --danger-soft: #FBEAEA;
+  --danger-border: #D9A0A0;
+
+  --shadow-sm: 0 1px 2px rgba(42, 38, 32, 0.06);
+  --shadow-md: 0 4px 16px rgba(42, 38, 32, 0.07);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ===== Layout de página ===== */
+
+.page-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 2rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 0.35rem;
+}
+
+.page-sub {
+  color: var(--ink-soft);
+  font-size: 0.925rem;
+  max-width: 46ch;
+  margin: 0;
+}
+
+/* ===== Cards genéricos ===== */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.panel-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panel-title i { color: var(--wood); font-size: 1.05rem; }
+
+/* ===== Filtro ===== */
+
+.field-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.form-select, .form-control {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+  background-color: #FCFBF9;
+}
+
+.form-select:focus, .form-control:focus {
+  border-color: var(--wood);
+  box-shadow: 0 0 0 3px rgba(139, 90, 43, 0.15);
+}
+
+.btn-filter-primary {
+  background: var(--wood);
+  border-color: var(--wood);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.55rem 1.35rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+.btn-filter-primary:hover { background: var(--wood-dark); border-color: var(--wood-dark); color: #fff; }
+
+.btn-filter-clear {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ink-soft);
+  font-weight: 500;
+  padding: 0.55rem 1.35rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+.btn-filter-clear:hover { background: #F0EDE6; color: var(--ink); }
+
+/* ===== Botões de ação principal (madeira — acento desta página) ===== */
+
+.btn-wood {
+  background: var(--wood);
+  border-color: var(--wood);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.6rem 1.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.btn-wood:hover { background: var(--wood-dark); border-color: var(--wood-dark); color: #fff; }
+
+/* ===== Stat cards (resumo) ===== */
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--wood);
+  border-radius: 10px;
+  padding: 1.15rem 1.35rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-card .stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--wood-soft);
+  color: var(--wood);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  margin-bottom: 0.15rem;
+}
+
+.stat-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.55rem;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.stat-value-sub {
+  display: block;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin-top: 0.1rem;
+}
+
+/* Stat card de alerta (produções sem pagamento) — única variante
+   de cor que não segue o acento madeira da página, de propósito:
+   é um estado de atenção, não uma categoria da página. */
+.stat-card.stat-card-unpaid {
+  border-left-color: var(--danger);
+}
+.stat-card.stat-card-unpaid .stat-icon {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* ===== Tabela de produções ===== */
+
+.table-productions {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
+}
+
+.table-productions thead th {
+  background: #FAF8F4;
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table-productions tbody td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  color: var(--ink);
+}
+
+.table-productions tbody tr:nth-child(even) {
+  background: #FBFAF7;
+}
+
+.table-productions tbody tr:hover {
+  background: var(--wood-soft);
+  transition: background 0.12s ease;
+}
+
+.table-productions tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cell-total {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.stage-badge {
+  background: var(--fiber-soft);
+  color: var(--fiber);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.6rem;
+  border-radius: 100px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  position: relative;
+  background:
+    linear-gradient(to right, var(--panel) 30%, rgba(255,255,255,0)),
+    linear-gradient(to right, rgba(255,255,255,0), var(--panel) 70%) 100% 0,
+    linear-gradient(to right, rgba(42,38,32,0.08), rgba(255,255,255,0) 12px),
+    linear-gradient(to left, rgba(42,38,32,0.08), rgba(255,255,255,0) 12px) 100% 0;
+  background-repeat: no-repeat;
+  background-size: 40px 100%, 40px 100%, 12px 100%, 12px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+
+/* ===== Badges de status de pagamento por produção ===== */
+
+.badge-paid {
+  background: var(--fiber-soft);
+  color: var(--fiber);
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.badge-pending {
+  background: var(--wood-soft);
+  color: var(--wood);
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* ===== Ações compactas (editar/excluir) na tabela ===== */
+
+.actions-cell {
+  display: flex;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.btn-icon-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.btn-icon-action:hover {
+  background: #F0EDE6;
+  color: var(--ink);
+}
+
+.btn-icon-action.is-danger:hover {
+  background: var(--danger-soft);
+  border-color: var(--danger-border);
+  color: var(--danger);
+}
+
+.btn-icon-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: transparent;
+}
+.btn-icon-action:disabled:hover {
+  background: transparent;
+  color: var(--ink-soft);
+  border-color: var(--border);
+}
+
+/*
+  Botão "Cancelar" dentro dos modais de criação (_new_production_modal.html).
+  Autônomo de propósito — não reaproveita .btn-filter-clear (que
+  também existe neste arquivo) para não criar acoplamento entre um
+  botão de modal e um botão de card de filtro, mesmo tendo visual
+  parecido. Paleta madeira, consistente com o resto desta página.
+*/
+.btn-modal-cancel {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ink-soft);
+  font-weight: 500;
+  padding: 0.55rem 1.35rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+.btn-modal-cancel:hover {
+  background: var(--wood-soft);
+  color: var(--wood-dark);
+  border-color: var(--wood);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--ink-soft);
+}
+.empty-state i { font-size: 1.75rem; margin-bottom: 0.5rem; display: block; color: var(--border); }
+
+/* ===== Responsivo ===== */
+
+@media (max-width: 900px) {
+  .stat-row { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+  .page-wrap { padding: 1.5rem 1rem 3rem; }
+  .page-header { flex-direction: column; }
+}
+
+@media (max-width: 560px) {
+  .stat-row { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table-productions tbody tr { transition: none; }
+}

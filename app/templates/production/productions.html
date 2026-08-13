@@ -1,0 +1,136 @@
+{#
+  Container principal de /production/ (gerenciamento de produções).
+
+  Segue o MESMO padrão estrutural de payments.html: filtro (GET) →
+  divs vazias preenchidas via JS → nenhum form de criação grande
+  na página principal (isso agora é modal, fora deste arquivo).
+
+  Endpoints referenciados que AINDA NÃO EXISTEM em production/views.py
+  (hoje só há index e create) — marcados como TODO abaixo:
+    - production.filter        (GET com querystring, filtra por período+produto)
+    - production.update        (POST, edição de uma produção)
+    - production.delete        (POST, exclusão de uma produção)
+
+  Assume que o JS (production.events.js, ainda a criar) faz o mesmo
+  papel de payment.events.js: fetch nos endpoints acima, injeta HTML
+  nas divs #production-cards e #production-table, abre o modal de
+  edição populando os campos a partir de data-* attributes do botão
+  clicado (mesmo padrão do modal de pagamento).
+#}
+
+{% from "bootstrap5/utils.html" import render_static %}
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-wrap page-production">
+
+  <!-- ========== CABEÇALHO ========== -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">Produções</div>
+      <p class="page-sub">
+        Consulte, edite e acompanhe as produções já registradas.
+      </p>
+    </div>
+    <button
+      type="button"
+      class="btn btn-wood"
+      data-bs-toggle="modal"
+      data-bs-target="#modalNewProduction"
+    >
+      <i class="bi bi-plus-lg"></i>
+      Nova Produção
+    </button>
+  </div>
+
+  <!-- ========== CARD DE FILTRO ========== -->
+  <div class="panel" id="filterCard">
+    <div class="panel-title">
+      <i class="bi bi-funnel"></i> Filtrar produções
+    </div>
+
+    {# TODO: action real quando production.filter existir. Hoje o
+       formulário existe só para refletir o estado na URL (querystring);
+       o JS deve interceptar o submit e buscar via fetch, sem reload. #}
+    <form method="GET" id="formProductionFilter">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="field-label">Data inicial</label>
+          <input
+            type="date"
+            class="form-control"
+            name="start_date"
+            value="{{ request.args.get('start_date', '') }}"
+          />
+        </div>
+        <div class="col-md-3">
+          <label class="field-label">Data final</label>
+          <input
+            type="date"
+            class="form-control"
+            name="end_date"
+            value="{{ request.args.get('end_date', '') }}"
+          />
+        </div>
+        <div class="col-md-3">
+          <label class="field-label">Produto</label>
+          <select class="form-select" name="product_id">
+            <option value="" selected>Todos os produtos</option>
+            {% for product in products %}
+            <option value="{{ product.id }}" {% if request.args.get('product_id') == product.id|string %}selected{% endif %}>
+              {{ product.family.name }} — {{ product.material.name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-filter-primary flex-fill">
+            <i class="bi bi-search"></i> Filtrar
+          </button>
+          <a href="{{ request.path }}" class="btn btn-filter-clear">Limpar</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="production-cards"></div>
+
+  <!-- ========== LISTA DE PRODUÇÕES ========== -->
+  <div class="panel mt-4">
+    <div class="d-none" id="production_alert"></div>
+    <div class="panel-title">
+      <i class="bi bi-table"></i> Produções registradas
+    </div>
+
+    <div id="production-table"></div>
+  </div>
+
+</div>
+
+{% include "production/_edit_modal.html" %}
+{% include "production/_new_production_modal.html" %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+{# TODO: production.events.js ainda não existe — criar seguindo o
+   mesmo padrão de payment.events.js (fetch nos endpoints, injeta
+   HTML nas divs acima, listeners de editar/excluir/filtrar). #}
+<script
+  type="module"
+  src="{{ url_for('static', filename='js/modules/production/production.events.js') }}"
+></script>
+{% endblock %}
+
+{% block extra_css %}
+{#
+  production.css depende de classes já definidas em payments.css
+  (.panel, .stat-row, .stat-card, .table-scroll, .badge-paid,
+  .badge-pending, .field-label, .form-select/.form-control,
+  .btn-filter-*, .empty-state, variáveis do :root). Carrega os
+  dois — não duplicar essas classes em production.css.
+#}
+{{ render_static('css', 'css/payments.css') }}
+{{ render_static('css', 'css/production.css') }}
+{% endblock %}

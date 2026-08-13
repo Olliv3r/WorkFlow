@@ -1,5 +1,5 @@
 ### Estado atual
-- [ ] Filtrar produções
+- [ ] Filtrar produções (pagamento)
 - [x] Criar pagamento
 - [x] Alterar estado do pagamento
 - [ ] Criar relatorio
@@ -7,10 +7,15 @@
 - [ ] Criar produtos
 - [ ] Ideia de calculo de varios pagamentos
 - [x] Tornar cards do pagamento em partiais html
-- [ ] Página para gerenciar as produções
+- [x] Página para gerenciar as produções
+- [ ] Filtrar produções (produção)
+- [ ] Editar produção
+- [ ] Excluir produção (se combinar com a regra de negocio)
+- [ ] Implementar modais de criar/editar produção
+- [ ] Implementar modais de criar/editar produto
 
 ### Ponto de partida
-- Implementar outra página para listar todos as produções e gerenciá-las - isso evita que o as produções e resumo na página de pagamentos virem lixos.
+- Implementar as modais de criar/editar produção
 
 ### Bug
 - Nenhum bug conhecido

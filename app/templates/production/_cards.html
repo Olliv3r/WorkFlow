@@ -1,0 +1,59 @@
+{#
+  Partial injetado em #production-cards via JS.
+
+  DIFERENTE da referência de pagamento (_cards_partial.html), que
+  tem um bug conhecido: lá o {% for %} envolve o <div class="stat-row">
+  inteiro, repetindo os cards uma vez por item. Aqui o total é
+  resolvido uma vez, fora do loop — a view/service que chama este
+  template deve passar total_productions, total_dozens, total_amount,
+  unpaid_count e unpaid_amount já calculados (mesmo princípio já
+  usado em payment: total_dozens/total_amount chegam prontos, não
+  são somados no Jinja).
+#}
+
+{% if productions %}
+
+<div class="stat-row">
+  <div class="stat-card">
+    <div class="stat-icon"><i class="bi bi-clipboard-data"></i></div>
+    <div>
+      <div class="stat-label">Produções</div>
+      <div class="stat-value">{{ productions|length }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+    <div>
+      <div class="stat-label">Dúzias</div>
+      <div class="stat-value">{{ total_dozens }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+    <div>
+      <div class="stat-label">Valor Total</div>
+      <div class="stat-value">R$ {{ "%.2f"|format(total_amount)|replace('.', ',') }}</div>
+    </div>
+  </div>
+  <div class="stat-card stat-card-unpaid">
+    <div class="stat-icon"><i class="bi bi-exclamation-circle"></i></div>
+    <div>
+      <div class="stat-label">Sem Pagamento</div>
+      <div class="stat-value">
+        {{ unpaid_count }}
+        <span class="stat-value-sub">R$ {#{{ "%.2f"|format(unpaid_amount)|replace('.', ',') }}#}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% else %}
+
+<div class="panel">
+  <div class="empty-state">
+    <i class="bi bi-inbox"></i>
+    <p class="mb-0">Nenhuma produção encontrada para este filtro.<br>Ajuste os critérios e busque novamente.</p>
+  </div>
+</div>
+
+{% endif %}

@@ -1,0 +1,85 @@
+{#
+  Partial injetado em #production-table via JS.
+
+  Coluna "Pagamento" usa production.payment (relationship já
+  existente no model Production, confirmada em turnos anteriores)
+  para indicar se aquela produção já está vinculada a um Payment
+  ou ainda está solta (payment_id nulo).
+
+  Botões de Editar/Excluir seguem o mesmo padrão de
+  _history_table.html (data-* attributes, sem <form>, populados
+  e tratados via JS) — não via onsubmit=confirm() como o botão de
+  excluir pagamento (versão anterior, antes de você decidir mover
+  tudo para JS).
+#}
+
+{% if productions %}
+<div class="table-scroll">
+  <table class="table-productions">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Produto</th>
+        <th>Etapa</th>
+        <th>Dúzias</th>
+        <th>Valor/dúzia</th>
+        <th>Total</th>
+        <th>Pagamento</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for production in productions %}
+      <tr>
+        <td>{{ production.date.strftime('%d/%m/%Y') }}</td>
+        <td>{{ production.product.family.name }} — {{ production.product.material.name }}</td>
+        <td><span class="stage-badge">{{ production.stage.name }}</span></td>
+        <td>{{ production.dozens }}</td>
+        <td>R$ {{ "%.2f"|format(production.price_per_dozen)|replace('.', ',') }}</td>
+        <td class="cell-total">R$ {{ "%.2f"|format(production.total_amount)|replace('.', ',') }}</td>
+        <td>
+          {% if production.payment.status == "paid" %}
+          <span class="badge-paid"><i class="bi bi-check-circle-fill"></i> Pago</span>
+          {% elif production.payment.status == "pending" %}
+          <span class="badge-pending"><i class="bi bi-dash-circle"></i> Pendente</span>
+          {% else %}
+          <span class="badge-pending"><i class="bi bi-dash-circle"></i> Sem pagamento</span>
+          {% endif %}
+        </td>
+        <td class="actions-cell">
+          <button
+            type="button"
+            class="btn-icon-action"
+            data-bs-toggle="modal"
+            data-bs-target="#modalEditProduction"
+            data-production-id="{{ production.id }}"
+            data-production-date="{{ production.date.isoformat() }}"
+            data-production-product-id="{{ production.product.id }}"
+            data-production-stage-id="{{ production.stage.id }}"
+            data-production-dozens="{{ production.dozens }}"
+            data-production-price="{{ production.price_per_dozen }}"
+            data-production-observation="{{ production.observation or '' }}"
+            title="Editar"
+          >
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button
+            type="button"
+            class="btn-icon-action is-danger"
+            data-production-id="{{ production.id }}"
+            {% if production.payment %}disabled title="Não é possível excluir: já vinculada a um pagamento"{% else %}title="Excluir"{% endif %}
+          >
+            <i class="bi bi-trash3"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="bi bi-archive"></i>
+  <p class="mb-0">Nenhuma produção registrada ainda.</p>
+</div>
+{% endif %}

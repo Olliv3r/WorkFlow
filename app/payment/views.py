@@ -14,7 +14,7 @@ def index():
 @bp.route("/cards/partial", methods=["GET"])
 def cards_partial():
     productions = ps.get_productions()
-    total_dozens, total_amount = ps.get_unpaid_summary()
+    unpaid_count, total_dozens, total_amount = ps.get_unpaid_summary()
     start_period, end_period = ps.get_period()
   
     return jsonify(
@@ -43,9 +43,13 @@ def history_partial():
 @bp.route("/create", methods=["POST"])
 def create():
     ids = list(map(int, request.form.getlist("production_ids")))
-    payment = ps.payment_create(ids)
-  
-    return jsonify(status="success", message="Pagamento criado com sucesso")
+
+    try:
+        payment = ps.payment_create(ids)
+        return jsonify(status="success", message="Pagamento criado com sucesso")
+
+    except NotFoundError as error:
+        return jsonify(status="error", message=str(error.message))
 
 # Excluir pagamento
 @bp.route("/<int:payment_id>/delete", methods=["POST"])
@@ -57,6 +61,7 @@ def delete(payment_id):
             return jsonify(status="error", message="Não foi possível excluir o pagamento")
   
         return jsonify(status="success", message="Pagamento excluido com sucesso")
+      
     except (NotFoundError, PermissionError) as error:
         return jsonify(status="error", message=str(error.message))
 

@@ -18,6 +18,12 @@ def create_app(config=Config):
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
+    from app.stage import bp as stage_bp
+    app.register_blueprint(stage_bp, url_prefix="/stage")
+  
+    from app.hole import bp as hole_bp
+    app.register_blueprint(hole_bp, url_prefix="/hole")
+  
     from app.production import bp as production_bp
     app.register_blueprint(production_bp, url_prefix="/production")
 

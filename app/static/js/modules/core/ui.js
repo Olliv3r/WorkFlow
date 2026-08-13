@@ -1,9 +1,7 @@
 export const UI = {
   setLoading(selector, isLoading) {
     const $button = $(selector);
-
-    //$button.prop("disabled", isLoading);
-
+    
     if (isLoading) {
       $button.data("content", $button.html());
       $button
@@ -32,7 +30,10 @@ export const UI = {
   },
 
   hideAlert(selector, type) {
-    $(selector).addClass("d-none").text("").removeClass(`alert alert-${type}`);
+    $(selector)
+      .addClass("d-none")
+      .text("")
+      .removeClass(`alert alert-${type}`);
   },
 
   clearInput(inputEl) {
@@ -41,5 +42,56 @@ export const UI = {
 
   reset(formSelector) {
     $(formSelector)[0].reset();
+  },
+
+  // Montar um select 
+  populateSelect(
+    selectId,
+    data, 
+    defaultId=null, 
+    includeEmptyOption=false
+  ) {
+    const select = $(selectId).empty()
+  
+    if(includeEmptyOption) {
+      select.append($("<option>", {
+        value: "",
+        text: "Selecione uma opção",
+        disabled: true,
+        selected: !defaultId
+      }))
+    }
+    
+    const options = data.map(item => 
+      $("<option>", {
+        value: item.id,
+        text: item.entity !== "stage" ? `${item.family_name} - ${item.material_name} - ${item.hole_quantity} furos` : item.name,
+        selected: item.id === defaultId
+      })
+    )
+    
+    select.append(options)
+    
+    if(defaultId !== null) {
+      selectId.val(defaultId)
+    }
+  }, 
+  
+  // Preencher um formulário
+  fillFormFields(
+    formSelector, 
+    data
+  ) {
+    Object.entries(data).forEach(([key, value]) => {
+      const $el = $(`${formSelector} #${key}`)
+      
+      if(!$el.length) return
+      
+      if($el.is(":checkbox")) {
+         $el.prop("checked", !!value)
+      } else {
+        $el.val(value)
+      }
+    })
   }
-};
+}

@@ -9,8 +9,13 @@ class ProductionRepository(CommonRepository):
     
     def get_unpaid_summary(self):
         return self.session.query(
-            func.sum(self.model.dozens).label("total_dozens"),
-            func.sum(self.model.total_amount).label("total_amount"),
+            func.count(self.model.id).label("production_count"),
+            func.coalesce(
+              func.sum(self.model.dozens).label("total_dozens"), 0
+            ),
+            func.coalesce(
+              func.sum(self.model.total_amount).label("total_amount"), 0
+            ),
         ).filter(self.model.payment_id.is_(None))
 
     def get_unpaid(self):

@@ -1,4 +1,6 @@
 from app.production.repositories import *
+from app.stage.repositories import stage_repository
+from app.production.utils.serializers import serialize_production
 from datetime import datetime
 from app.core.exceptions import NotFoundError, ValidationError
 from app.models import Production
@@ -6,7 +8,7 @@ from app.models import Production
 class ProductionService:
     @staticmethod
     def get_products():
-        return product_repository.all()
+        return product_repository.all(order_by="id", descending=True)
     
     @staticmethod
     def get_stages():
@@ -41,6 +43,10 @@ class ProductionService:
         return payment_repository.all()
 
     @staticmethod
+    def get_unpaid_summary():
+        return production_repository.get_unpaid_summary().first()
+
+    @staticmethod
     def production_create(dto):
         if not dto.is_valid():
             raise ValidationError("Dados faltando")
@@ -72,4 +78,15 @@ class ProductionService:
         production_repository.commit()
 
         return True
+
+    @staticmethod
+    def get_data(production_id: int):
+        production = production_repository.filter_by(id=production_id).first()
+
+        if production is None:
+            raise NotFoundError("Produção não encontrada")
+
+        serialized = serialize_production(production)
+      
+        return serialized
 

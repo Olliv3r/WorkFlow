@@ -4,7 +4,6 @@ from app.payment.repositories.payment_repository import PaymentRepository
 
 # ROOT
 from .production_repository import ProductionRepository
-from .stage_repository import StageRepository
 from .family_repository import FamilyRepository
 from .material_repository import MaterialRepository
 from .hole_repository import HoleRepository
@@ -13,7 +12,6 @@ from .quality_repository import QualityRepository
 
 # INSTANCIAS
 product_repository = ProductRepository()
-stage_repository = StageRepository()
 family_repository = FamilyRepository()
 material_repository = MaterialRepository()
 hole_repository = HoleRepository()

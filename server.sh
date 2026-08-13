@@ -61,7 +61,7 @@ flask() { "$VENV/flask" "$@"; }
 flask_db() { flask db "$@" ;}
 
 # Executa o servidor flask
-run() { flask run "$@"; }
+run() { flask "$@"; }
 
 resetMigrations() {
   flask_db init

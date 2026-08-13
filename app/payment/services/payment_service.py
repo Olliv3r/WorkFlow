@@ -4,18 +4,22 @@ from app.payment.repositories import *
 from app.models import Payment
 
 class PaymentService:
+    # Conseguir todos os pagamentos
     @staticmethod
     def get_payments():
-        return payment_repository.all()
+        return payment_repository.all(order_by="id", descending=True)
 
+    # Conseguir todas as produções não pagas
     @staticmethod
     def get_productions():
         return production_repository.filter_by(payment_id=None).all()
 
+    # Conseguir o total de dúzias e quantidades das produções
     @staticmethod
     def get_unpaid_summary():
         return production_repository.get_unpaid_summary().first()
 
+    # Conseguir o periodo inicial e final das produções
     @staticmethod
     def get_period():
         result = production_repository.get_unpaid().first()

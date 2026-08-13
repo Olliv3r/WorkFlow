@@ -6,28 +6,49 @@ from app.core.exceptions import NotFoundError, ValidationError
 from datetime import date
 from decimal import Decimal
 
-@bp.route("/", methods=["GET",])
+
+# Página padrão
+@bp.route("/", methods=["GET"])
 def index():
     products = ps.get_products()
     stages = ps.get_stages()
-    families = ps.get_families()
-    materials = ps.get_materials()
-    holes = ps.get_holes()
-    sticks = ps.get_sticks()
-    qualities = ps.get_qualities()
-
+  
     return render_template(
-        "production/production_form.html",
-        title="Cadastrar produções e produtos",
+        "production/productions.html",
+        title="Gerenciar produções",
         products=products,
-        stages=stages,
-        families=families,
-        materials=materials,
-        holes=holes,
-        sticks=sticks,
-        qualities=qualities
+        stages=stages
     )
 
+# Partial de cards
+@bp.route("/cards/partial", methods=["GET"])
+def cards_partial():
+    productions = ps.get_productions()
+    unpaid_count, total_dozens, total_amount = ps.get_unpaid_summary()
+  
+    return jsonify(
+        render_template(
+            "production/_cards.html",
+            productions=productions,
+            unpaid_count=unpaid_count,
+            total_dozens=total_dozens,
+            total_amount=total_amount
+        )
+    )
+
+# Partial de tabela
+@bp.route("/table/partial", methods=["GET"])
+def table_partial():
+    productions = ps.get_productions()
+
+    return jsonify(
+        render_template(
+            "production/_table.html",
+            productions=productions
+        )
+    )
+
+# Criar produção
 @bp.route("/create", methods=["POST"])
 def create():
     form = request.form
@@ -59,3 +80,13 @@ def create():
     except (NotFoundError, ValidationError) as error:
         return jsonify(status="error", message=str(error.message))
 
+# Consegue dados de produção
+@bp.route("/<int:production_id>/data", methods=["GET"])
+def get_data(production_id):
+    try:
+        production = ps.get_data(production_id)
+        return jsonify(status="success", message="Dados de produção encontrados", production=production)
+    
+    except NotFoundError as error:
+        return jsonify(status="error", message=str(error.message))
+      

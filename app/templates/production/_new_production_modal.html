@@ -1,0 +1,92 @@
+{#
+  Modal de criação de produção. ID casa com o botão "Nova Produção"
+  já existente em production.html (data-bs-target="#modalNewProduction",
+  confirmado em app/production.html, turno 16).
+
+  IDs de campo usam prefixo "newProduction*" para não colidir com
+  os do modal de edição (_edit_modal.html, prefixo "edit*"), já que
+  os dois modais coexistem na mesma página host.
+
+  Mesmo padrão do modal de edição: action="#" é placeholder, sem
+  reload — o submit deve ser interceptado via JS (fetch para
+  production.create), não navegação nativa do form.
+#}
+
+<div class="modal fade" id="modalNewProduction" tabindex="-1" aria-labelledby="modalNewProductionLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalNewProductionLabel">
+          <i class="bi bi-plus-lg"></i> Nova Produção
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <div class="d-none" id="production-alert"></div>
+
+      {# TODO: action real (production.create já existe como rota —
+         url_for('production.create') — mas o submit deve ser via
+         fetch no JS, não navegação nativa, para manter o padrão
+         "sem reload" do resto do sistema). #}
+      <form method="POST" action="#" id="formNewProduction">
+        <div class="modal-body">
+
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label class="field-label">Produto<span class="req">*</span></label>
+              <select class="form-select" name="product_id" id="newProductionProductId" required>
+                <option value="" selected disabled>Selecionar produto</option>
+                {% for product in products %}
+                <option value="{{ product.id }}">
+                  {{ product.family.name }} - {{ product.material.name }} - {{ product.hole.quantity }} furos
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="field-label">Etapa<span class="req">*</span></label>
+              <select class="form-select" name="stage_id" id="newProductionStageId" required>
+                <option value="" selected disabled>Selecionar etapa</option>
+                {% for stage in stages %}
+                <option value="{{ stage.id }}">{{ stage.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="field-label">Quantidade em dúzias<span class="req">*</span></label>
+              <input type="number" class="form-control" name="dozens" id="newProductionDozens" min="1" required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="field-label">Preço por dúzia<span class="req">*</span></label>
+              <input type="text" class="form-control" name="price_per_dozen" id="newProductionPrice" required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="field-label">Data<span class="req">*</span></label>
+              <input type="date" class="form-control" name="date" id="newProductionDate" required>
+            </div>
+
+            <div class="col-12">
+              <label class="field-label">Observação</label>
+              <textarea class="form-control" name="observation" id="newProductionObservation" rows="3"></textarea>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+          <button id="btnCreate" type="submit" class="btn btn-wood">
+            <i class="bi bi-check-lg"></i> Salvar Produção
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
