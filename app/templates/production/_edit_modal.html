@@ -11,7 +11,7 @@
 #}
 
 <div class="modal fade" id="modalEditProduction" tabindex="-1" aria-labelledby="modalEditProductionLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
 
       <div class="modal-header">
@@ -21,11 +21,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
       </div>
 
-      {# TODO: action real quando production.update existir #}
-      <form method="POST" action="#" id="formProductionEdit">
-        <div class="modal-body">
+      <div class="d-none" id="production-edit-alert"></div>
 
-          <input type="hidden" name="production_id" id="editProductionId">
+      {# TODO: action real quando production.update existir #}
+      <form method="POST" id="formProductionEdit">
+        <div class="modal-body">
 
           <div class="row g-3">
 
@@ -64,7 +64,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn btn-filter-clear" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-wood">
+          <button id="btnEdit" type="submit" class="btn btn-wood">
             <i class="bi bi-check-lg"></i> Salvar alterações
           </button>
         </div>

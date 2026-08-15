@@ -13,13 +13,21 @@ class ProductionCreateDTO(CreateBaseDTO):
     stage_id: int
     dozens: int
     price_per_dozen: Decimal
-    date: date
+    date: date | None = None
     observation: str | None = None
 
     def is_valid(self):
         return (
-            isinstance(self.product_id, int) and isinstance(self.stage_id, int) and isinstance(self.dozens, int) and isinstance(self.price_per_dozen, Decimal) and isinstance(self.date, date) and (
-    self.observation is None or
-    isinstance(self.observation, str)
+            isinstance(self.product_id, int)
+            and isinstance(self.stage_id, int) 
+            and isinstance(self.dozens, int) 
+            and isinstance(self.price_per_dozen, Decimal) 
+            and (
+                self.date is None 
+                or isinstance(self.date, date)
+            ) 
+            and (
+                self.observation is None 
+                or isinstance(self.observation, str)
             )
         )

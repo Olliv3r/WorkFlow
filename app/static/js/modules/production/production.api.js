@@ -22,6 +22,14 @@ export const ProductionAPI = {
 			data: formData
 		})
 	},
+  
+  // Editar produção
+	edit(formData, productionId) {
+		return ClientAPI.post({
+			url: `/production/${productionId}/edit`,
+			data: formData
+		})
+	},
 
   // Conseguir dados de produção
   fetch_data(productionId) {

@@ -25,7 +25,18 @@ $(document).ready(function() {
 
       const productionId = $(this).data("production-id")
       ProductionActions.handleOptions(productionId)
-      //ProductionActions.handleGetData(productionId)
     }
+  )
+
+  // Editar produção
+	$("#formProductionEdit").on(
+    "submit", 
+    function(event) {
+      event.preventDefault()
+
+      const productionId = $(this).data("production-id")
+		  const formData = new FormData(this)
+        ProductionActions.handleProductionEdit(formData, productionId)
+	  }
   )
 })

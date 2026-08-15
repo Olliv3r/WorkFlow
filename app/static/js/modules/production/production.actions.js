@@ -53,20 +53,7 @@ export const ProductionActions = {
 		}
 	},
 
-  // Conseguir dados de produção  
-  async handleGetData(productionId) {
-    try {
-      const response = await ProductionAPI.fetch_data(productionId)
-      UI.fillFormFields("#formProductionEdit", response.production)
-      
-    } catch (error) {
-    	console.error(error)
-      
-    } finally {
-    	console.log("Dados de produção carregados")
-    }
-  },
-
+  // Carrega dados padrão ao editar
   async handleOptions(productionId) {
     try {
     	const [
@@ -84,19 +71,25 @@ export const ProductionActions = {
       
       UI.populateSelect(
         s_product, 
-        product_res.products, 
-        production_res.production.product_id,
+        product_res.data, 
+        production_res.data.product_id,
         true
       )
       UI.populateSelect(
         s_stage,
-        stage_res.stages, 
-        production_res.production.stage_id,
+        stage_res.data, 
+        production_res.data.stage_id,
         true
       )
       UI.fillFormFields(
         "#formProductionEdit", 
-        production_res.production
+        production_res.data
+      )
+      
+      ProductionUI.setAttr(
+        "#formProductionEdit", 
+        "data-production-id", 
+        production_res.data.id
       )
       
     } catch (error) {
@@ -105,5 +98,26 @@ export const ProductionActions = {
     } finally {
     	console.log("Opções carregadas")
     }
-  }
+  },
+
+  // Editar produção
+	async handleProductionEdit(formData, productionId) {
+		UI.setLoading("#formProductionEdit #btnEdit", true)
+    
+		try {
+			const response = await ProductionAPI.edit(formData, productionId)
+
+			if (response.status === "success") {
+        this.handleLoadCardsPartial()
+        this.handleLoadTablePartial()
+			}
+
+			const color = response.status === "success" ? "success" : "danger"
+
+			UI.showAlert("#production-edit-alert", color, response.message)
+			
+		} finally {
+			UI.setLoading("#formProductionEdit #btnEdit", false)
+		}
+	}
 }

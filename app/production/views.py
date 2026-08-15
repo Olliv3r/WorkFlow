@@ -85,8 +85,34 @@ def create():
 def get_data(production_id):
     try:
         production = ps.get_data(production_id)
-        return jsonify(status="success", message="Dados de produção encontrados", production=production)
+        return jsonify(status="success", message="Dados de produção encontrados", data=production)
     
     except NotFoundError as error:
         return jsonify(status="error", message=str(error.message))
+
+# Editar dados da produção
+@bp.route("/<int:production_id>/edit", methods=["POST"])
+def edit_data(production_id):
+    form = request.form
+    price_per_dozen = Decimal(form["price_per_dozen"])
+  
+    try:
+        dto = ProductionCreateDTO.from_form(
+            product_id=int(form["product_id"]),
+            stage_id=int(form["stage_id"]),
+            dozens=int(form["dozens"]),
+            price_per_dozen=price_per_dozen,
+            observation=str(form["observation"])
+        )
+
+        result = ps.edit(production_id, dto)
+
+        if not result:
+            return jsonify(status="error", message="Não foi possível editar os dados")
+
+        return jsonify(status="success", message="Dados editados com sucesso")
       
+    except (NotFoundError, ValidationError) as error:
+        return jsonify(status="error", message=str(error.message))
+      
+    

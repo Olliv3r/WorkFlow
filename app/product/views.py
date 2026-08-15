@@ -7,7 +7,7 @@ from app.core.exceptions import NotFoundError
 def get_options():
     try:
         products = ps.get_products()
-        return jsonify(status="success", message="Dados de produtos encontrados", products=products)
+        return jsonify(status="success", message="Dados de produtos encontrados", data=products)
       
     except NotFoundError as error:
         return jsonify(status="error", message=str(error.message))
