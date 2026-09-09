@@ -1,305 +1,546 @@
-# WorkFlow
+WorkFlow
 
-Sistema web para gerenciamento e acompanhamento de produção, desenvolvido com Flask e SQLAlchemy.
+Sistema web desenvolvido em Python + Flask para registrar, organizar e acompanhar produções, produtos, etapas, preços e pagamentos.
 
-O WorkFlow foi criado para organizar o registro da produção, produtos, materiais, valores e pagamentos em um único sistema, reduzindo controles manuais e facilitando o acompanhamento financeiro da produção.
+O WorkFlow nasceu para resolver um problema real de controle de produção: substituir registros manuais e cálculos repetitivos por um sistema simples capaz de armazenar o histórico de trabalho, calcular valores e facilitar o acompanhamento da produtividade e dos pagamentos.
 
-![WorkFlow — Preview do sistema](assets/preview.png)
+---
 
-## 🚀 Tecnologias
+«[!IMPORTANT]
 
-- Python
-- Flask
-- SQLAlchemy
-- Flask-Migrate / Alembic
-- Bootstrap-Flask
-- SQLite
-- Jinja2
-- Bootstrap 5
-- JavaScript modularizado (ES Modules) / jQuery
+⚠️ Sobre a versão deste repositório
 
-## 📋 Funcionalidades
+O código disponível atualmente na branch principal deste repositório ainda corresponde à versão original que desenvolvi e posteriormente pausei.
 
-### Produção
+Essa versão foi mantida no repositório como parte do histórico de desenvolvimento do projeto.
 
-- Registro das produções realizadas
-- Associação da produção a um produto e a uma etapa
-- Registro da quantidade produzida em dúzias
-- Registro do valor por dúzia
-- Cálculo do valor total da produção
-- Observações sobre a produção
-- Consulta do histórico de produção
+A versão mais recente e aprimorada do WorkFlow está disponível na seção Releases.
 
-### Produtos
+Se você deseja utilizar as funcionalidades mais novas, correções e melhorias descritas neste README, baixe a versão mais recente em:
 
-O sistema permite cadastrar produtos a partir de suas características, evitando a necessidade de recriar as mesmas combinações durante o registro da produção.
+GitHub → Releases → Latest Release
 
-Os produtos podem ser definidos de acordo com características como:
+O código da versão atualizada poderá ser incorporado à branch principal futuramente.»
 
-- Família do produto
+---
+
+📌 Sobre o projeto
+
+O WorkFlow é um sistema monolítico voltado para controle de produção e pagamentos.
+
+O sistema permite registrar cada produção realizada informando dados como:
+
+- Produto
+- Etapa
+- Quantidade produzida em dúzias
+- Preço por dúzia
+- Data
+- Observação
+
+A partir dessas informações, o WorkFlow calcula os valores correspondentes e mantém um histórico que posteriormente pode ser utilizado para criar pagamentos e gerar relatórios.
+
+O fluxo principal do sistema é:
+
+Produzir
+   ↓
+Registrar produção
+   ↓
+Acompanhar histórico
+   ↓
+Selecionar produções
+   ↓
+Criar pagamento
+   ↓
+Confirmar pagamento
+   ↓
+Analisar produção e resultados
+
+---
+
+✨ Funcionalidades
+
+📦 Produções
+
+Permite registrar e acompanhar as produções realizadas.
+
+Cada produção pode possuir:
+
+- Produto
+- Etapa
+- Quantidade de dúzias
+- Preço por dúzia
+- Valor total
+- Data
+- Observação
+- Pagamento relacionado
+
+O valor total da produção é calculado utilizando:
+
+Valor total = dúzias × preço por dúzia
+
+Recursos
+
+- Criar produção
+- Editar produção
+- Excluir produção quando permitido
+- Filtrar produções
+- Visualizar histórico
+- Selecionar produções para pagamento
+- Registrar novamente uma produção anterior
+
+⚡ Registrar novamente
+
+A opção Registrar novamente permite reutilizar os dados de uma produção anterior para agilizar novos registros semelhantes.
+
+Isso reduz o preenchimento repetitivo quando o mesmo produto e etapa são utilizados frequentemente.
+
+---
+
+📦 Produtos
+
+O WorkFlow permite cadastrar diferentes combinações de produtos utilizadas durante a produção.
+
+Um produto pode ser composto por características como:
+
+- Família
 - Material
 - Qualidade
 - Quantidade de furos
 - Tipo de taco
 
-> ⚠️ O cadastro de novos produtos já está disponível na interface, mas a criação ainda não foi implementada no backend (`ProductService.product_create` está pendente).
+O sistema também verifica combinações duplicadas para evitar o cadastro acidental do mesmo produto várias vezes.
 
-### Pagamentos
+Gerenciamento
 
-O WorkFlow permite organizar os pagamentos com base em períodos de produção.
+Produtos podem ser:
 
-Um pagamento possui:
+- Criados
+- Consultados
+- Ativados
+- Desativados
 
-- Data inicial e final do período
-- Data do pagamento
-- Valor total e total de dúzias
-- Status (`pending` ou `paid`)
-- Observação
+Um produto desativado não precisa ser apagado.
 
-O valor do pagamento é calculado a partir das produções ainda não vinculadas a nenhum pagamento (`payment_id` nulo) dentro do período selecionado. Ao criar um pagamento, todas as produções escolhidas são vinculadas a ele.
+Dessa forma, registros históricos continuam apontando corretamente para o produto utilizado naquela produção.
 
-Ações disponíveis por pagamento:
+---
 
-- **Marcar como Pago** / **Reverter para Pendente** — alterna o status e ajusta `payment_date` automaticamente
-- **Excluir** — permitido apenas para pagamentos com status `pending`; ao excluir, as produções vinculadas são automaticamente desvinculadas (`payment_id = None`) e voltam a ficar disponíveis para um novo pagamento
+🏭 Etapas
 
-## 🏗️ Arquitetura
+As produções podem ser associadas a diferentes etapas do processo produtivo.
 
-O projeto é organizado **por módulo de domínio** (blueprint), e não por camada técnica global. Cada módulo (`production`, `payment`, `product`) contém suas próprias subpastas de `repositories/`, `services/` e `dtos/`, mantendo a lógica de cada domínio isolada.
+Exemplos:
 
-Fluxo de uma requisição:
+Amarração
+Enchimento
+Pinação
+Penteação
+Aparação
+Encabação
+Acabamentos
 
-```
-Request
-   │
-   ▼
-Views (Blueprint) ── recebe a requisição, monta o DTO a partir do form
-   │
-   ▼
-Service ── validação e regra de negócio
-   │
-   ▼
-Repository ── acesso ao banco de dados
-   │
-   ▼
-SQLAlchemy Models
-   │
-   ▼
-Database
-```
+A estrutura permite adicionar e organizar outras etapas conforme o processo produtivo evoluir.
 
-### Responsabilidades
+---
 
-**Views (por blueprint):**
-Recebem as requisições HTTP, extraem os dados do formulário/request, montam o DTO correspondente e retornam a resposta (renderização de template ou JSON, dependendo da rota).
+💵 Tabela de preços
 
-**Services:**
-Concentram as regras de negócio — validação de DTO, busca de entidades relacionadas, cálculo de totais, e as regras de transição de estado (ex.: um pagamento só pode ser excluído se ainda estiver `pending`).
+O WorkFlow possui uma tabela responsável por relacionar:
 
-**Repositories:**
-Responsáveis pelo acesso aos dados. Todos herdam de `CommonRepository` (`app/common/repositories/`), que concentra as operações básicas (`all`, `filter_by`, `add`, `commit`, `delete`), e cada módulo estende isso com consultas específicas do seu domínio.
+Produto + Etapa → Preço por dúzia
 
-**Models:**
-Entidades persistidas via SQLAlchemy, em `app/models/` — compartilhadas entre todos os módulos, já que produção, produto e pagamento se relacionam entre si.
+Exemplo:
 
-**DTOs:**
-Estruturas (`dataclasses`) usadas para transportar e validar dados vindos do formulário antes de chegar à camada de serviço, com um método `is_valid()` próprio de validação.
+Produto: Extra 20 furos
+Etapa: Amarração
+Preço: R$ 2,50 / dúzia
 
-**Core (`app/core/`):**
-Hierarquia de exceções da aplicação (`AppException` e subclasses como `NotFoundError`, `ValidationError`, `ConflictError`, `PermissionError`), cada uma associada a um `status_code` HTTP, usada pelos services para sinalizar erros de forma consistente entre módulos.
+Quando uma produção é registrada, o preço utilizado é armazenado na própria produção.
 
-## 📁 Estrutura
+Isso significa que alterações futuras na tabela de preços não modificam os valores históricos.
 
-A estrutura real do projeto:
+Exemplo:
 
-```
-WorkFlow/
+Janeiro
+Preço: R$ 2,00
+
+Março
+Novo preço: R$ 2,50
+
+Uma produção registrada em janeiro continua mantendo o preço original de R$ 2,00.
+
+Verificação de preços
+
+A versão mais recente também identifica combinações de produto e etapa que ainda não possuem preço configurado.
+
+Isso ajuda a encontrar configurações incompletas antes de registrar novas produções.
+
+---
+
+💰 Pagamentos
+
+Produções podem ser agrupadas para formar pagamentos.
+
+O sistema calcula automaticamente:
+
+- Quantidade total de dúzias
+- Valor total
+- Período correspondente
+- Produções incluídas
+
+Os pagamentos possuem estados como:
+
+Pendente
+Pago
+
+Recursos
+
+- Criar pagamento
+- Confirmar pagamento
+- Reabrir pagamento
+- Excluir pagamento quando permitido
+- Filtrar pagamentos por período
+- Adicionar observações
+- Visualizar detalhes
+- Consultar todas as produções pertencentes ao pagamento
+
+---
+
+⚡ Fechamentos rápidos
+
+A versão mais recente facilita a seleção das produções que devem fazer parte de um pagamento.
+
+São disponibilizados períodos rápidos para auxiliar o fechamento, reduzindo a necessidade de selecionar manualmente grandes quantidades de registros.
+
+O objetivo é tornar mais simples fluxos de pagamento:
+
+Semanais
+Quinzenais
+Mensais
+ou por períodos personalizados
+
+---
+
+🛡️ Proteção contra pagamentos duplicados
+
+O backend possui validações adicionais para impedir que uma produção já vinculada a um pagamento seja adicionada novamente a outro.
+
+A regra não depende apenas da interface.
+
+Antes da criação do pagamento, o sistema verifica o estado das produções selecionadas.
+
+Isso reduz o risco de inconsistências financeiras.
+
+---
+
+📊 Dashboard
+
+A versão mais recente adiciona uma página inicial voltada para acompanhamento rápido do sistema.
+
+O Dashboard utiliza os dados registrados para apresentar uma visão geral da produção e dos valores acumulados.
+
+Entre as informações que podem ser acompanhadas estão dados relacionados a:
+
+- Produções
+- Dúzias produzidas
+- Valores
+- Pagamentos
+- Períodos recentes
+- Situação geral da produção
+
+O objetivo é fazer o WorkFlow deixar de ser apenas um sistema de cadastro e passar também a ajudar na interpretação dos dados registrados.
+
+---
+
+📈 Relatórios
+
+A versão mais recente possui relatórios mais completos.
+
+As produções podem ser analisadas por:
+
+Produto
+
+Permite descobrir quais produtos representam a maior parte da produção.
+
+Etapa
+
+Permite analisar quanto foi produzido em cada etapa.
+
+Dia
+
+Permite acompanhar a evolução diária da produção.
+
+Período
+
+É possível delimitar datas específicas para analisar apenas um intervalo desejado.
+
+Exemplo:
+
+01/09/2026 → 30/09/2026
+
+Os relatórios apresentam informações como:
+
+Dúzias
+Valor produzido
+Quantidade de registros
+Produtos
+Etapas
+Datas
+
+---
+
+📄 Exportação CSV
+
+Os dados dos relatórios podem ser exportados para arquivos CSV.
+
+Isso permite utilizar os registros do WorkFlow em ferramentas externas como:
+
+- Microsoft Excel
+- Google Sheets
+- LibreOffice Calc
+- Python/Pandas
+- Ferramentas de análise de dados
+
+Essa funcionalidade também fornece uma maneira simples de transportar informações para outros sistemas.
+
+---
+
+💾 Backup
+
+A versão mais recente permite baixar uma cópia do banco SQLite utilizado pelo WorkFlow.
+
+O backup preserva informações como:
+
+Produções
+Produtos
+Etapas
+Preços
+Pagamentos
+Histórico
+
+É recomendado realizar backups periodicamente, principalmente antes de atualizações importantes no sistema.
+
+---
+
+🛡️ Integridade dos dados
+
+Diversas validações são realizadas no backend para evitar registros inconsistentes.
+
+Entre elas:
+
+- Verificação de produtos existentes
+- Verificação de etapas existentes
+- Verificação de produtos ativos
+- Verificação de etapas ativas
+- Proteção contra produtos duplicados
+- Proteção contra pagamentos duplicados
+- Validação de quantidade produzida
+- Validação de preços
+- Tratamento de valores monetários
+- Validação das produções antes de criar pagamentos
+
+As regras importantes não ficam exclusivamente no JavaScript da interface.
+
+O backend continua responsável pela validação final dos dados.
+
+---
+
+🗃️ Banco de dados
+
+O projeto utiliza SQLite.
+
+Essa escolha mantém o sistema simples e adequado ao objetivo atual do WorkFlow.
+
+Não é necessário configurar um servidor externo de banco de dados para utilizar o projeto.
+
+Exemplo:
+
+instance/
+└── dev.db
+
+O banco mantém os relacionamentos entre entidades como:
+
+Product
+Production
+Stage
+Price
+Payment
+Material
+Quality
+Hole
+StickType
+ProductFamily
+
+---
+
+🏗️ Arquitetura
+
+O WorkFlow utiliza uma arquitetura modular baseada em domínios.
+
+Estrutura simplificada:
+
+app/
 │
-├── app/
-│   ├── production/
-│   │   ├── repositories/     (production, stage, family, material, hole, stick, quality)
-│   │   ├── services/
-│   │   ├── dtos/
-│   │   └── views.py
-│   │
-│   ├── payment/
-│   │   ├── repositories/
-│   │   ├── services/
-│   │   ├── dtos/
-│   │   └── views.py
-│   │
-│   ├── product/
-│   │   ├── repositories/
-│   │   ├── services/
-│   │   ├── dtos/
-│   │   └── views.py
-│   │
-│   ├── main/
-│   │   └── views.py
-│   │
-│   ├── seed/
-│   │   ├── repositories/
-│   │   ├── services/
-│   │   └── seed_dict.py      (dados de seed: famílias, materiais, tacos, etapas, produtos)
-│   │
-│   ├── common/
-│   │   └── repositories/     (CommonRepository — base para todos os repositories)
-│   │
-│   ├── core/
-│   │   └── exceptions.py     (hierarquia de exceções da aplicação)
-│   │
-│   ├── models/                (models SQLAlchemy compartilhados)
-│   ├── templates/
-│   │   ├── base.html
-│   │   ├── sidebar.html
-│   │   ├── production/
-│   │   └── payment/           (payments.html + _cards_partial.html + _history_table.html)
-│   │
-│   ├── static/
-│   │   ├── css/
-│   │   └── js/
-│   │       └── modules/       (production/ e payment/, cada um com api.js, events.js, actions.js, ui.js)
-│   │
-│   └── extensions.py
+├── production/
+│   ├── views.py
+│   ├── services/
+│   ├── repositories/
+│   ├── dtos/
+│   └── models/
 │
-├── migrations/
-├── docs/
-│   └── preview.png
+├── payment/
+│   ├── views.py
+│   ├── services/
+│   ├── repositories/
+│   └── models/
 │
-├── config.py
-├── main.py
-├── requirements.txt
-└── README.md
-```
+├── product/
+│
+├── price/
+│
+├── report/
+│
+└── shared/
 
-A separação por domínio (em vez de por camada global) significa que uma alteração na regra de pagamento, por exemplo, fica contida em `app/payment/`, sem tocar em `app/production/` ou `app/product/`.
+O objetivo é manter responsabilidades separadas sem transformar o projeto em uma arquitetura desnecessariamente complexa.
 
-## ⚙️ Instalação
+O fluxo normalmente segue:
+
+View
+  ↓
+DTO / validação
+  ↓
+Service
+  ↓
+Repository
+  ↓
+SQLAlchemy
+  ↓
+SQLite
+
+---
+
+🧰 Tecnologias
+
+Principais tecnologias utilizadas:
+
+Python
+Flask
+SQLAlchemy
+SQLite
+HTML
+CSS
+JavaScript
+jQuery
+
+---
+
+🚀 Executando o projeto
 
 Clone o repositório:
 
-```bash
-git clone https://github.com/Olliv3r/WorkFlow.git
+git clone <URL_DO_REPOSITORIO>
+
+Entre no diretório:
+
 cd WorkFlow
-```
 
 Crie um ambiente virtual:
 
-```bash
 python -m venv .venv
-```
 
-Ative o ambiente virtual.
+Linux / Termux
 
-Linux / macOS:
-
-```bash
 source .venv/bin/activate
-```
 
-Windows:
+Windows
 
-```bash
 .venv\Scripts\activate
-```
 
 Instale as dependências:
 
-```bash
 pip install -r requirements.txt
-```
 
-Inicialize o banco de dados com as migrations:
+Execute a aplicação conforme o entrypoint presente na versão utilizada.
 
-```bash
-flask db upgrade
-```
+---
 
-(Opcional) Popule o banco com dados iniciais de família, material, taco, etapa e produtos:
+📥 Qual versão devo baixar?
 
-```bash
-./server.sh seed
-```
+Existem atualmente duas situações diferentes.
 
-Execute a aplicação:
+Código da branch principal
 
-```bash
-flask run
-```
+Representa a versão do WorkFlow que foi desenvolvida originalmente antes da pausa no desenvolvimento.
 
-## 🗄️ Banco de dados
+Ela permanece disponível para preservar o estado e o histórico daquela fase do projeto.
 
-O projeto utiliza SQLAlchemy como ORM. Durante o desenvolvimento, o banco utilizado é o SQLite.
+Releases
 
-As alterações estruturais do banco são controladas através de migrations com Alembic/Flask-Migrate.
+Os Releases contêm as versões mais recentes e aprimoradas do WorkFlow.
 
-```bash
-flask db migrate -m "descrição da alteração"
-flask db upgrade
-```
+Se você deseja testar ou utilizar as funcionalidades descritas nas seções mais recentes deste README, utilize:
 
-Valores monetários (`price_per_dozen`, `total_amount`) são armazenados como `Numeric(12, 2)`, não como float — evitando os erros de arredondamento comuns em cálculos financeiros com ponto flutuante.
+GitHub
+   ↓
+Releases
+   ↓
+Latest Release
+   ↓
+Download
 
-## 🔄 Fluxo de produção
+«Para obter atualmente a versão mais completa do WorkFlow, utilize o arquivo disponibilizado no Release mais recente.»
 
-```
-Produto (cadastrado previamente)
-   │
-   ▼
-Registro da produção
-   │
-   ├── Data
-   ├── Produto
-   ├── Etapa
-   ├── Dúzias
-   ├── Valor por dúzia
-   └── Observação
-   │
-   ▼
-Produção armazenada (payment_id = null)
-   │
-   ▼
-Seleção de produções não pagas dentro de um período
-   │
-   ▼
-Criação do pagamento (agrupa as produções selecionadas)
-   │
-   ▼
-Pagamento pending → paid (ação manual, registra payment_date)
-```
+---
 
-Isso permite que as produções sejam registradas individualmente, ao longo do tempo, e agrupadas posteriormente em um período para pagamento — sem que uma produção possa ser paga duas vezes, já que uma vez vinculada a um pagamento ela deixa de aparecer como pendente.
+🗺️ Direção do projeto
 
-## 🎯 Objetivo do projeto
+O objetivo do WorkFlow não é se transformar em um ERP genérico.
 
-O principal objetivo do WorkFlow é transformar um processo que depende de anotações e cálculos manuais em um sistema organizado, confiável e fácil de utilizar.
+A prioridade é resolver bem o fluxo para o qual foi criado:
 
-Além de resolver o problema específico para o qual foi desenvolvido, o projeto também serve como aplicação prática de conceitos de desenvolvimento web com Python, incluindo:
+Produção
+    ↓
+Registro
+    ↓
+Organização
+    ↓
+Pagamento
+    ↓
+Relatórios
+    ↓
+Análise
 
-- Arquitetura modular por domínio em Flask
-- ORM com SQLAlchemy e tipos `Numeric` para valores monetários
-- Repository Pattern com base compartilhada (`CommonRepository`)
-- Service Layer com hierarquia de exceções própria
-- DTOs com validação (`dataclasses`)
-- Migrations
-- Relacionamentos entre entidades (produto ↔ produção ↔ pagamento)
-- JavaScript modularizado (ES Modules) para interações dinâmicas, sem recarregar a página
+Novas funcionalidades devem continuar seguindo três princípios:
 
-## 📌 Status
+1. Resolver um problema real do processo produtivo.
+2. Reduzir trabalho manual.
+3. Evitar complexidade sem benefício prático.
 
-🚧 Em desenvolvimento
+---
 
-O projeto ainda está passando por mudanças na arquitetura e implementação de funcionalidades. Pontos conhecidos em aberto:
+📌 Estado atual
 
-- Criação de produto (`ProductService.product_create`) ainda não implementada
-- Links de "Cadastro de Preço" e "Relatórios" no menu lateral ainda não têm rota associada
+O projeto passou por uma pausa após sua primeira fase de desenvolvimento.
 
-Novas funcionalidades e melhorias serão adicionadas conforme o desenvolvimento avançar.
+Posteriormente, uma versão aprimorada foi criada adicionando novas funcionalidades de produtividade, pagamentos, relatórios, segurança e análise.
 
-## 👨‍💻 Autor
+Por enquanto:
 
-Desenvolvido por [Olliv3r](https://github.com/Olliv3r).
+Branch principal → versão original antes da pausa
 
-## 📄 Licença
+Releases → versões mais recentes e aprimoradas
 
-Este projeto ainda não possui uma licença definida.
+Consulte sempre a seção Releases para verificar a versão mais atual disponível.
+
+---
+
+📜 Licença
+
+Consulte o arquivo de licença do repositório para conhecer as condições de uso, modificação e distribuição do projeto.
+
+---
+
+WorkFlow
+
+Registrar. Organizar. Acompanhar. Analisar.
