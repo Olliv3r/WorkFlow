@@ -1,6 +1,6 @@
 WorkFlow
 
-![assets/preview.png](Preview do sistema)
+![Preview do sistema](assets/preview.png)
 
 Sistema web desenvolvido em Python + Flask para registrar, organizar e acompanhar produções, produtos, etapas, preços e pagamentos.
 
