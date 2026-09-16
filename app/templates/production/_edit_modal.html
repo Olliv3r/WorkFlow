@@ -3,11 +3,8 @@
   show.bs.modal, lendo event.relatedTarget.dataset, mesmo padrão
   documentado para o modal dinâmico de pagamento).
 
-  action="#" é placeholder: production.update ainda não existe como
-  rota. O <form> existe para estrutura/acessibilidade (labels,
-  required); o submit real deve ser interceptado via JS (fetch),
-  não navegação de página — mantendo o padrão "sem reload" do
-  restante do sistema.
+  O submit é interceptado via JS (fetch), mantendo o padrão
+  "sem reload" do restante do sistema.
 #}
 
 <div class="modal fade" id="modalEditProduction" tabindex="-1" aria-labelledby="modalEditProductionLabel" aria-hidden="true">
@@ -23,7 +20,6 @@
 
       <div class="d-none" id="production-edit-alert"></div>
 
-      {# TODO: action real quando production.update existir #}
       <form method="POST" id="formProductionEdit">
         <div class="modal-body">
 
@@ -51,7 +47,7 @@
 
             <div class="col-md-4">
               <label class="field-label">Data<span class="req">*</span></label>
-              <input type="date" class="form-control" name="date" id="date" readonly disabled>
+              <input type="date" class="form-control" name="date" id="date" required>
             </div>
 
             <div class="col-12">

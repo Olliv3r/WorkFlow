@@ -9,7 +9,7 @@ class Production(db.Model):
     __tablename__ = "productions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    date: Mapped[date] = mapped_column(Date)
+    date: Mapped[date] = mapped_column(Date, index=True)
     dozens: Mapped[int] = mapped_column(Integer)
     price_per_dozen: Mapped[Decimal] = mapped_column(Numeric(12, 2))
     total_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=Decimal("0.00"))
@@ -20,19 +20,19 @@ class Production(db.Model):
         back_populates="productions"
     )
     product_id: Mapped[int] = mapped_column(
-        ForeignKey("products.id")
+        ForeignKey("products.id"), index=True
     )
 
     stage: Mapped["Stage"] = relationship(
         back_populates="productions"
     )
     stage_id: Mapped[int] = mapped_column(
-        ForeignKey("stages.id")
+        ForeignKey("stages.id"), index=True
     )
 
     payment: Mapped[Optional["Payment"]] = relationship(
         back_populates="productions"
     )
     payment_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("payments.id")
+        ForeignKey("payments.id"), index=True
     )

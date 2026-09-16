@@ -1,4 +1,4 @@
-{% if productions %}
+{% if productions or daily_works %}
   <!-- RESUMO -->
   <div class="stat-row">
     <div class="stat-card">
@@ -74,7 +74,7 @@
                 <td>{{ production.date.strftime('%d/%m/%Y') }}</td>
                 <td>
                   {{ production.product.family.name }} — {{
-                  production.product.material.name }}
+                  production.product.material.name }} · {{ production.product.hole.quantity }} furos
                 </td>
                 <td>
                   <span class="stage-badge">{{ production.stage.name }}</span>
@@ -95,6 +95,8 @@
         </div>
       </div>
     </div>
+
+    {% if daily_works %}<div class="col-lg-8"><div class="panel mt-3"><div class="panel-title"><i class="bi bi-calendar-check"></i> Diárias do período</div><div class="table-scroll"><table class="table-productions"><thead><tr><th>Data</th><th>Tipo</th><th>Valor</th></tr></thead><tbody>{% for d in daily_works %}<tr><td>{{ d.date.strftime('%d/%m/%Y') }}</td><td>{{ 'Inteira' if d.fraction == 1 else 'Meia' }}</td><td>R$ {{ '%.2f'|format(d.total_amount)|replace('.', ',') }}</td></tr>{% endfor %}</tbody></table></div></div></div>{% endif %}
 
     <!-- CARD LATERAL: RESUMO DO PAGAMENTO -->
     <div class="col-lg-4">
@@ -123,6 +125,7 @@
             <span class="label">Dúzias</span>
             <span class="value" id="total_dozens">{{ total_dozens }}</span>
           </div>
+          {% if daily_works %}<div class="settle-summary-row"><span class="label">Diárias</span><span class="value">{{ daily_works|length }}</span></div>{% for d in daily_works %}<input type="hidden" name="daily_work_ids" value="{{ d.id }}">{% endfor %}{% endif %}
           <div class="settle-summary-row total">
             <span class="label">Valor total</span>
             <span class="value" id="total_amount"
@@ -165,7 +168,7 @@
     <div class="empty-state">
       <i class="bi bi-inbox"></i>
       <p class="mb-0">
-        Nenhuma produção pendente encontrada para este período.<br />Ajuste as
+        Nenhuma produção ou diária pendente encontrada para este período.<br />Ajuste as
         datas e busque novamente.
       </p>
     </div>

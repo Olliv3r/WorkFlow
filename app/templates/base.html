@@ -1,32 +1,69 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     {% block head %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ficha - {{ title }}</title>
+    <meta name="theme-color" content="#0f2742" />
+    <title>WorkFlow — {{ title }}</title>
+
+    {{ bootstrap.load_css() }}
 
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/styles.css') }}"
     />
 
-    {{ bootstrap.load_css() }}
-
     {% block extra_css %}{% endblock %}
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/modern.css') }}"
+    />
     {% endblock %}
   </head>
   <body>
     {% include "sidebar.html" %}
+
     <div class="app-main">
-      {% block content %}{% endblock %}
+      <header class="app-topbar">
+        <div class="topbar-context">
+          <span class="topbar-eyebrow">WorkFlow</span>
+          <span class="topbar-separator"></span>
+          <strong>{{ title }}</strong>
+        </div>
+        <div class="topbar-meta">
+          <span class="topbar-date" id="topbarDate"></span>
+          <span class="topbar-status"><span class="status-dot"></span> Sistema local</span>
+        </div>
+      </header>
+
+      <main class="app-content">
+        {% block content %}{% endblock %}
+      </main>
     </div>
 
     {{ bootstrap.load_js() }}
 
     <script src="{{ url_for('static', filename='js/libs/jquery-3.7.1.min.js') }}"></script>
+    <script>
+      (() => {
+        const el = document.getElementById('topbarDate');
+        if (el) {
+          const now = new Date();
+          el.textContent = new Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit', month: 'short', year: 'numeric'
+          }).format(now).replace('.', '');
+        }
+
+        document.querySelectorAll('.app-sidebar .sidebar-link').forEach((link) => {
+          link.addEventListener('click', () => {
+            const toggle = document.getElementById('sidebarToggle');
+            if (toggle && window.innerWidth <= 900) toggle.checked = false;
+          });
+        });
+      })();
+    </script>
     {% block extra_scripts %}{% endblock %}
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
   </body>
 </html>

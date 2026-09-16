@@ -47,4 +47,30 @@ $(document).ready(function() {
 	    PaymentActions.handleToggleStatus(paymentId, this)
 	  }
   )
+
+
+  $("#filterCard").on("click", "[data-quick]", function(event) {
+    event.preventDefault()
+    PaymentActions.handleQuickPeriod($(this).data("quick"))
+  })
+
+  // Filtrar produções disponíveis por período (submit de
+  // #formPaymentFilter)
+  $("#formPaymentFilter").on(
+    "submit",
+    function(event) {
+      event.preventDefault()
+      PaymentActions.handleFilterPayments()
+    }
+  )
+
+  // Limpar filtro — mesmo princípio de production.events.js
+  $("#filterCard").on(
+    "click",
+    ".btn-filter-clear:not([data-quick])",
+    function(event) {
+      event.preventDefault()
+      PaymentActions.handleClearPaymentFilters()
+    }
+  )
 })

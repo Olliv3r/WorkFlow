@@ -1,14 +1,19 @@
 from app.models import *
 from app.seed.seed_dict import *
 from app.production.repositories import *
+from app.stage.repositories import stage_repository
+from app.price.repositories import price_repository
 
 class SeedService:
     @staticmethod
-    def create_entity(list_dict: list, repository, model):
+    def create_entity(list_dict: list, repository, model, identity_field="name"):
         for item in list_dict:
-            entity_existing = repository.filter_by(**item).first()
+            identity = {identity_field: item[identity_field]}
+            entity_existing = repository.filter_by(**identity).first()
 
             if entity_existing:
+                for key, value in item.items():
+                    setattr(entity_existing, key, value)
                 continue
 
             entity_new = model(**item)
@@ -46,7 +51,8 @@ class SeedService:
         return SeedService.create_entity(
             HOLES,
             hole_repository,
-            Hole
+            Hole,
+            identity_field="quantity"
         )
 
 
@@ -123,6 +129,32 @@ class SeedService:
             )
 
             product_repository.add(product_new)
+
+        # EXTRA 22/30 inherit the real EXTRA 20 combination instead of
+        # duplicating assumptions about material, quality or stick type.
+        extra_family = family_repository.filter_by(name="Extra").first()
+        hole20 = hole_repository.filter_by(quantity=20).first()
+        if extra_family and hole20:
+            source = product_repository.filter_by(family=extra_family, hole=hole20).first()
+            if source:
+                for quantity in (22, 30):
+                    target_hole = hole_repository.filter_by(quantity=quantity).first()
+                    if target_hole is None:
+                        raise ValueError(f"Furos {quantity} não encontrados")
+                    existing = product_repository.filter_by(
+                        family=source.family, material=source.material, quality=source.quality,
+                        hole=target_hole, stick_type=source.stick_type).first()
+                    if not existing:
+                        existing = Product(family=source.family, material=source.material, quality=source.quality,
+                            hole=target_hole, stick_type=source.stick_type)
+                        product_repository.add(existing)
+                        product_repository.session.flush()
+                    source_prices = price_repository.filter_by(product_id=source.id).all()
+                    for source_price in source_prices:
+                        price_exists = price_repository.filter_by(product_id=existing.id, stage_id=source_price.stage_id).first()
+                        if not price_exists:
+                            price_repository.add(Price(product_id=existing.id, stage_id=source_price.stage_id,
+                                price_per_dozen=source_price.price_per_dozen))
 
         return product_repository.commit()
 

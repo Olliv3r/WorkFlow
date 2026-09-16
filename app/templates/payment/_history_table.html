@@ -43,6 +43,7 @@
                     {% endif %}
                 </td>
                 <td>
+                    <a href="{{ url_for('payment.details', payment_id=payment.id) }}" class="btn-payment-details mb-1"><i class="bi bi-eye"></i> Detalhes</a>
                     <button
                         data-payment-id="{{ payment.id }}"
                         type="button"

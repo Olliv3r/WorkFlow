@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #F7F5F0;
+  --panel: #FFFFFF;
+  --ink: #2A2620;
+  --ink-soft: #6B6459;
+  --border: #E4DFD3;
+  --fiber: #4A5D3A;
+  --fiber-soft: #E7ECE1;
+
+  /* Mesmo acento de report.css — ambas são telas de
+     consulta/configuração administrativa, não uma das quatro
+     páginas operacionais principais. */
+  --slate: #3E5C76;
+  --slate-dark: #2F4759;
+  --slate-soft: #E5EAEF;
+
+  --shadow-sm: 0 1px 2px rgba(42, 38, 32, 0.06);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.page-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.page-header { margin-bottom: 2rem; }
+
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 2rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 0.35rem;
+}
+
+.page-sub {
+  color: var(--ink-soft);
+  font-size: 0.925rem;
+  max-width: 60ch;
+  margin: 0;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.panel-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.panel-title i { color: var(--slate); font-size: 1.05rem; }
+
+.field-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+.field-label .req { color: #B54545; margin-left: 2px; }
+
+.form-select, .form-control {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+  background-color: #FCFBF9;
+}
+.form-select:focus, .form-control:focus {
+  border-color: var(--slate);
+  box-shadow: 0 0 0 3px rgba(62, 92, 118, 0.15);
+}
+
+.btn-slate {
+  background: var(--slate);
+  border-color: var(--slate);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.btn-slate:hover { background: var(--slate-dark); border-color: var(--slate-dark); color: #fff; }
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.table-price {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
+}
+.table-price thead th {
+  background: #FAF8F4;
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.table-price tbody td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  color: var(--ink);
+}
+.table-price tbody tr:nth-child(even) { background: #FBFAF7; }
+.table-price tbody tr:last-child td { border-bottom: none; }
+
+.cell-total { font-weight: 600; color: var(--ink); }
+
+.stage-badge {
+  background: var(--fiber-soft);
+  color: var(--fiber);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.6rem;
+  border-radius: 100px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--ink-soft);
+}
+.empty-state i { font-size: 1.75rem; margin-bottom: 0.5rem; display: block; color: var(--border); }
+
+@media (max-width: 768px) {
+  .page-wrap { padding: 1.5rem 1rem 3rem; }
+}

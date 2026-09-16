@@ -1,0 +1,78 @@
+{% from "bootstrap5/utils.html" import render_static %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-wrap page-production">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Produção #{{ production.id }}</div>
+      <p class="page-sub">Informações registradas desta produção.</p>
+    </div>
+    <a href="{{ url_for('production.index') }}" class="btn btn-filter-clear">
+      <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+      <div>
+        <div class="stat-label">Dúzias</div>
+        <div class="stat-value">{{ production.dozens }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="bi bi-cash"></i></div>
+      <div>
+        <div class="stat-label">Preço/dúzia</div>
+        <div class="stat-value">R$ {{ '%.2f'|format(production.price_per_dozen)|replace('.', ',') }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+      <div>
+        <div class="stat-label">Total</div>
+        <div class="stat-value">R$ {{ '%.2f'|format(production.total_amount)|replace('.', ',') }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel mt-4">
+    <div class="panel-title"><i class="bi bi-info-circle"></i> Dados da produção</div>
+    <div class="table-scroll">
+      <table class="table-productions">
+        <tbody>
+          <tr><th>Data</th><td>{{ production.date.strftime('%d/%m/%Y') }}</td></tr>
+          <tr><th>Produto</th><td>{{ production.product.family.name }} — {{ production.product.material.name }} · {{ production.product.hole.quantity }} furos</td></tr>
+          <tr><th>Qualidade</th><td>{{ production.product.quality.name if production.product.quality else '—' }}</td></tr>
+          <tr><th>Tipo de taco</th><td>{{ production.product.stick_type.name }}</td></tr>
+          <tr><th>Etapa</th><td>{{ production.stage.name }}</td></tr>
+          <tr><th>Dúzias</th><td>{{ production.dozens }}</td></tr>
+          <tr><th>Preço por dúzia</th><td>R$ {{ '%.2f'|format(production.price_per_dozen)|replace('.', ',') }}</td></tr>
+          <tr><th>Valor total</th><td>R$ {{ '%.2f'|format(production.total_amount)|replace('.', ',') }}</td></tr>
+          <tr>
+            <th>Pagamento</th>
+            <td>
+              {% if production.payment %}
+                {% if production.payment.status == 'paid' %}
+                  <span class="badge-paid"><i class="bi bi-check-circle-fill"></i> Pago</span>
+                {% else %}
+                  <span class="badge-pending"><i class="bi bi-dash-circle"></i> Pendente</span>
+                {% endif %}
+                <a href="{{ url_for('payment.details', payment_id=production.payment.id) }}" class="text-action ms-2">Ver pagamento #{{ production.payment.id }}</a>
+              {% else %}
+                <span class="badge-pending"><i class="bi bi-dash-circle"></i> Sem pagamento</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr><th>Observação</th><td>{{ production.observation or '—' }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+  {{ render_static('css', 'css/production.css') }}
+{% endblock %}

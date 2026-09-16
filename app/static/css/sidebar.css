@@ -14,6 +14,11 @@
   --settle: #2F6B5E;
   --settle-soft: #E3EEEC;
 
+  /* Mesma cor usada em report.css — consistência entre o item da
+     sidebar e a página de Relatórios que ele abre. */
+  --slate: #3E5C76;
+  --slate-soft: #E5EAEF;
+
   --sidebar-width: 240px;
 }
 
@@ -143,6 +148,12 @@
   background: var(--settle-soft);
   color: var(--settle);
   border-left-color: var(--settle);
+  font-weight: 600;
+}
+.sidebar-link.accent-report.active {
+  background: var(--slate-soft);
+  color: var(--slate);
+  border-left-color: var(--slate);
   font-weight: 600;
 }
 .sidebar-link.accent-fiber:hover {

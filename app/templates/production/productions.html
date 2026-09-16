@@ -59,7 +59,7 @@
             <option value="" selected>Todos os produtos</option>
             {% for product in products %}
             <option value="{{ product.id }}" {% if request.args.get('product_id') == product.id|string %}selected{% endif %}>
-              {{ product.family.name }} — {{ product.material.name }}
+              {{ product.family.name }} — {{ product.material.name }} · {{ product.hole.quantity }} furos
             </option>
             {% endfor %}
           </select>

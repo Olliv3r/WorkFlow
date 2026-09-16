@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block content %}
+<div class="page-wrap">
+<div class="page-header"><div><div class="page-title">Diárias</div><p class="page-sub">Registre diárias inteiras e meias diárias de serviços auxiliares.</p></div></div>
+<div class="panel mb-4"><div class="panel-title">Nova diária</div><form method="post" action="{{ url_for('daily_work.create') }}" class="row g-3">
+<div class="col-md-3"><label class="field-label">Data</label><input type="date" name="date" class="form-control" required></div>
+<div class="col-md-2"><label class="field-label">Tipo</label><select name="fraction" class="form-select"><option value="1.0">Diária inteira</option><option value="0.5">Meia diária</option></select></div>
+<div class="col-md-3"><label class="field-label">Valor da diária inteira</label><input name="daily_rate" inputmode="decimal" class="form-control" required></div>
+<div class="col-md-4"><label class="field-label">Descrição</label><input name="description" class="form-control" value="Acabamentos e serviços auxiliares"></div>
+<div class="col-12"><label class="field-label">Observação</label><input name="observation" class="form-control"></div><div class="col-12"><button class="btn btn-slate">Registrar</button></div></form></div>
+<div class="panel"><div class="panel-title">Histórico</div><div class="table-responsive"><table class="table"><thead><tr><th>Data</th><th>Tipo</th><th>Base</th><th>Gerado</th><th>Pagamento</th><th></th></tr></thead><tbody>
+{% for x in items %}<tr><td>{{ x.date.strftime('%d/%m/%Y') }}</td><td>{{ 'Inteira' if x.fraction == 1 else 'Meia' }}</td><td>R$ {{ '%.2f'|format(x.daily_rate)|replace('.', ',') }}</td><td>R$ {{ '%.2f'|format(x.total_amount)|replace('.', ',') }}</td><td>{{ '#%s'|format(x.payment_id) if x.payment_id else 'Pendente' }}</td><td>{% if not x.payment_id %}<form method="post" action="{{ url_for('daily_work.delete', item_id=x.id) }}"><button class="btn btn-sm btn-outline-danger">Excluir</button></form>{% endif %}</td></tr>{% else %}<tr><td colspan="6">Nenhuma diária registrada.</td></tr>{% endfor %}</tbody></table></div></div>
+</div>
+{% endblock %}

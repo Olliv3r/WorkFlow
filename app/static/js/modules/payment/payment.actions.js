@@ -2,11 +2,23 @@ import { PaymentAPI } from "./payment.api.js"
 import { PaymentUI } from "./payment.ui.js"
 import { UI } from "../core/ui.js"
 
+// Lê o estado atual do form de filtro (#formPaymentFilter) — mesmo
+// princípio de production.actions.js:readProductionFilters().
+function readPaymentFilters() {
+  const $form = $("#formPaymentFilter")
+  if (!$form.length) return {}
+
+  return {
+    start_date: $form.find("[name='start_date']").val() || undefined,
+    end_date: $form.find("[name='end_date']").val() || undefined,
+  }
+}
+
 export const PaymentActions = {
   // Carregar cards
-  async handleCardsPartial() {
+  async handleCardsPartial(filters = readPaymentFilters()) {
     try {
-      const response = await PaymentAPI.fetch_cards_partial()
+      const response = await PaymentAPI.fetch_cards_partial(filters)
       
       PaymentUI.replaceHtml("#cards", response)
 
@@ -115,5 +127,29 @@ export const PaymentActions = {
 		} finally {
 			console.log("Status updated")
 		}
-	}
+	},
+
+  // Aplicar o filtro de período (submit de #formPaymentFilter). Só
+  // recarrega os cards (produções disponíveis para novo pagamento) —
+  // o histórico de pagamentos já criados não é afetado por este
+  // filtro, que é sobre produções ainda não pagas.
+  handleFilterPayments() {
+    const filters = readPaymentFilters()
+    this.handleCardsPartial(filters)
+  },
+
+  handleQuickPeriod(quick) {
+    if (quick === "all") {
+      $("#formPaymentFilter")[0].reset()
+      this.handleCardsPartial({})
+      return
+    }
+    this.handleCardsPartial({ quick })
+  },
+
+  // Limpar filtro
+  handleClearPaymentFilters() {
+    $("#formPaymentFilter")[0].reset()
+    this.handleCardsPartial({})
+  }
 }

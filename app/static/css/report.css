@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #F7F5F0;
+  --panel: #FFFFFF;
+  --ink: #2A2620;
+  --ink-soft: #6B6459;
+  --border: #E4DFD3;
+
+  /* Acento próprio de Relatórios — não repete madeira (Produção),
+     fibra (Produto) nem settle (fechamento de Pagamento). Azul-
+     ardósia: sóbrio, remete a leitura/análise, sem competir com
+     as outras três cores já em uso no sistema. */
+  --slate: #3E5C76;
+  --slate-dark: #2F4759;
+  --slate-soft: #E5EAEF;
+
+  --shadow-sm: 0 1px 2px rgba(42, 38, 32, 0.06);
+  --shadow-md: 0 4px 16px rgba(42, 38, 32, 0.07);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.page-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 2rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 0.35rem;
+}
+
+.page-sub {
+  color: var(--ink-soft);
+  font-size: 0.925rem;
+  max-width: 60ch;
+  margin: 0;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.panel-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panel-title i { color: var(--slate); font-size: 1.05rem; }
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--slate);
+  border-radius: 10px;
+  padding: 1.15rem 1.35rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-card .stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--slate-soft);
+  color: var(--slate);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  margin-bottom: 0.15rem;
+}
+
+.stat-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.55rem;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.table-report {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
+}
+
+.table-report thead th {
+  background: #FAF8F4;
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table-report tbody td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  color: var(--ink);
+}
+
+.table-report tbody tr:nth-child(even) {
+  background: #FBFAF7;
+}
+
+.table-report tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cell-total {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.badge-pending-report {
+  background: var(--slate-soft);
+  color: var(--slate);
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--ink-soft);
+}
+.empty-state i { font-size: 1.75rem; margin-bottom: 0.5rem; display: block; color: var(--border); }
+
+.report-note {
+  background: var(--slate-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.825rem;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+.report-note i { color: var(--slate); font-size: 1rem; margin-top: 0.1rem; flex-shrink: 0; }
+
+@media (max-width: 900px) {
+  .stat-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .page-wrap { padding: 1.5rem 1rem 3rem; }
+}

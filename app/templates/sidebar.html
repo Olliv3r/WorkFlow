@@ -1,51 +1,87 @@
 {% from "bootstrap5/utils.html" import render_static %}
 
-<!-- Estado do menu mobile (checkbox hack, sem JS) -->
 <input type="checkbox" id="sidebarToggle" class="sidebar-toggle-state">
 
-<!-- Botão hambúrguer — só aparece em mobile via CSS -->
-<label for="sidebarToggle" class="sidebar-hamburger" aria-hidden="false">
+<label for="sidebarToggle" class="sidebar-hamburger" aria-label="Abrir menu">
   <i class="bi bi-list"></i>
 </label>
 
-<!-- Overlay escurecido atrás do menu aberto em mobile -->
-<label for="sidebarToggle" class="sidebar-overlay"></label>
+<label for="sidebarToggle" class="sidebar-overlay" aria-hidden="true"></label>
 
-<nav class="app-sidebar">
-
+<nav class="app-sidebar" aria-label="Navegação principal">
   <div class="sidebar-brand">
-    <span class="sidebar-brand-mark">FP</span>
-    <span class="sidebar-brand-text">Ficha de<br>Produção</span>
+    <span class="sidebar-brand-mark"><i class="bi bi-bezier2"></i></span>
+    <span class="sidebar-brand-copy">
+      <strong>WorkFlow</strong>
+      <small>Produção & pagamentos</small>
+    </span>
   </div>
 
-  <div class="sidebar-section-label">Operação</div>
+  <div class="sidebar-nav">
+    <div class="sidebar-section-label">Visão geral</div>
 
-  <a href="{{ url_for('production.index') }}"
-     class="sidebar-link accent-wood {{ 'active' if request.path == url_for('production.index') else '' }}">
-    <i class="bi bi-bar-chart-steps"></i>
-    <span>Produção</span>
+    <a href="{{ url_for('main.index') }}"
+       class="sidebar-link {{ 'active' if request.path == url_for('main.index') else '' }}">
+      <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
+    </a>
+
+    <div class="sidebar-section-label">Operação</div>
+
+    <a href="{{ url_for('production.index') }}"
+       class="sidebar-link {{ 'active' if request.path.startswith('/production') else '' }}">
+      <i class="bi bi-clipboard2-data-fill"></i><span>Produções</span>
+    </a>
+
+    <a href="{{ url_for('daily_work.index') }}" class="sidebar-link {{ 'active' if request.path.startswith('/daily-work') else '' }}"><i class="bi bi-calendar-check-fill"></i><span>Diárias</span></a>
+
+    <a href="{{ url_for('advance.index') }}" class="sidebar-link {{ 'active' if request.path.startswith('/advance') else '' }}"><i class="bi bi-cash-coin"></i><span>Vales</span></a>
+
+    <a href="{{ url_for('payment.index') }}"
+       class="sidebar-link {{ 'active' if request.path.startswith('/payment') else '' }}">
+      <i class="bi bi-wallet2"></i><span>Pagamentos</span>
+    </a>
+
+    <div class="sidebar-section-label">Cadastros</div>
+
+    <a href="{{ url_for('registry.index') }}" class="sidebar-link {{ 'active' if request.path.startswith('/registry') else '' }}"><i class="bi bi-sliders"></i><span>Cadastros</span></a>
+
+    <a href="{{ url_for('product.index') }}"
+       class="sidebar-link {{ 'active' if request.path.startswith('/product') else '' }}">
+      <i class="bi bi-box-seam-fill"></i><span>Produtos</span>
+    </a>
+
+    <a href="{{ url_for('price.index') }}"
+       class="sidebar-link {{ 'active' if request.path.startswith('/price') else '' }}">
+      <i class="bi bi-tags-fill"></i><span>Preços</span>
+    </a>
+
+    <div class="sidebar-section-label">Análise</div>
+
+    <a href="{{ url_for('report.index') }}"
+       class="sidebar-link {{ 'active' if request.path.startswith('/report') else '' }}">
+      <i class="bi bi-bar-chart-fill"></i><span>Relatórios</span>
+    </a>
+  </div>
+
+  <div class="sidebar-spacer"></div>
+
+  <div class="sidebar-data-card">
+    <div class="sidebar-data-card-icon"><i class="bi bi-shield-check"></i></div>
+    <div>
+      <strong>Banco: {{ database_backend_name }}</strong>
+      {% if direct_database_backup %}
+      <small>Dados locais. Faça backups periódicos do arquivo SQLite.</small>
+      {% else %}
+      <small>Banco externo. Use também os backups do servidor/provedor.</small>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if direct_database_backup %}
+  <a href="{{ url_for('main.download_backup') }}" class="sidebar-link sidebar-backup">
+    <i class="bi bi-database-down"></i><span>Baixar backup</span>
   </a>
-
-  <a href="{{ url_for('payment.index') }}"
-     class="sidebar-link accent-settle {{ 'active' if request.path == url_for('payment.index') else '' }}">
-    <i class="bi bi-cash-stack"></i>
-    <span>Pagamentos</span>
-  </a>
-
-  <div class="sidebar-section-label">Cadastro</div>
-
-  {# TODO: trocar '#' pela rota real de cadastro de preço quando existir #}
-  <a href="#" class="sidebar-link accent-fiber">
-    <i class="bi bi-tag"></i>
-    <span>Cadastro de Preço</span>
-  </a>
-
-  {# TODO: trocar '#' pela rota real de relatórios quando existir #}
-  <a href="#" class="sidebar-link accent-fiber">
-    <i class="bi bi-graph-up"></i>
-    <span>Relatórios</span>
-  </a>
-
+  {% endif %}
 </nav>
 
 {% block extra_css %}

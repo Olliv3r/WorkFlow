@@ -1,0 +1,285 @@
+.analytics-panel {
+  overflow: hidden;
+}
+
+.wf-chart {
+  width: 100%;
+  min-height: 260px;
+  margin-top: 1rem;
+}
+
+.workflow-line-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 250px;
+  overflow: visible;
+}
+
+.chart-grid-line {
+  stroke: #e6edf5;
+  stroke-width: 1;
+}
+
+.chart-axis-label {
+  fill: #7a8798;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chart-x-label {
+  font-size: 11px;
+}
+
+.chart-line-path {
+  stroke: #1677ed;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-line-dot {
+  fill: #ffffff;
+  stroke: #1677ed;
+  stroke-width: 3;
+  transition: r .15s ease, stroke-width .15s ease;
+}
+
+.chart-line-dot:hover,
+.chart-line-dot:focus {
+  r: 6px;
+  stroke-width: 4px;
+  outline: none;
+}
+
+.workflow-bars {
+  display: grid;
+  gap: 1rem;
+}
+
+.workflow-bar-row {
+  min-width: 0;
+}
+
+.workflow-bar-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: .45rem;
+}
+
+.workflow-bar-label {
+  color: #24364b;
+  font-size: .9rem;
+  font-weight: 650;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.workflow-bar-value {
+  color: #0f2742;
+  font-size: .86rem;
+  white-space: nowrap;
+}
+
+.workflow-bar-track {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #edf2f8;
+  overflow: hidden;
+}
+
+.workflow-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #1677ed, #4d9dff);
+  transform-origin: left;
+  animation: workflowBarIn .45s ease both;
+  animation-delay: calc(var(--bar-order, 0) * 35ms);
+}
+
+@keyframes workflowBarIn {
+  from { transform: scaleX(0); opacity: .5; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+
+.chart-empty-state {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  color: #8492a3;
+  font-weight: 600;
+  text-align: center;
+  border: 1px dashed #d8e1ec;
+  border-radius: 16px;
+  background: #f8fafc;
+  padding: 1rem;
+}
+
+.analytics-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(260px, .9fr);
+  gap: 1rem;
+}
+
+.compare-card,
+.compare-period-card {
+  background: #ffffff;
+  border: 1px solid #e3eaf2;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 39, 66, .055);
+  padding: 1.2rem 1.25rem;
+}
+
+.compare-label {
+  color: #718096;
+  font-size: .78rem;
+  font-weight: 750;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.compare-value {
+  margin-top: .25rem;
+  color: #102a45;
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.compare-meta {
+  margin: .4rem 0 .75rem;
+  color: #8492a3;
+  font-size: .86rem;
+}
+
+.compare-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .35rem .6rem;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+.compare-badge.positive {
+  color: #087a54;
+  background: #e8f8f1;
+}
+
+.compare-badge.negative {
+  color: #b13a3a;
+  background: #fff0ef;
+}
+
+.compare-badge.neutral {
+  color: #68778a;
+  background: #eff3f7;
+}
+
+.compare-period-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: .3rem;
+  color: #5f6f82;
+}
+
+.compare-period-card small {
+  color: #8693a3;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.compare-period-card strong {
+  color: #1f344b;
+  font-size: .92rem;
+}
+
+.analytics-granularity {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 .7rem;
+  border-radius: 999px;
+  background: #eef5ff;
+  color: #1269d3;
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+@media (max-width: 980px) {
+  .analytics-compare-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .compare-period-card {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .analytics-compare-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .compare-period-card {
+    grid-column: auto;
+  }
+
+  .wf-chart {
+    min-height: 220px;
+  }
+
+  .workflow-line-svg {
+    min-width: 680px;
+  }
+
+  .wf-line-chart {
+    overflow-x: auto;
+    padding-bottom: .35rem;
+  }
+
+  .workflow-bar-header {
+    gap: .6rem;
+  }
+
+  .workflow-bar-label {
+    font-size: .84rem;
+  }
+}
+
+.analytics-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.chart-metric-switch {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: #eef3f8;
+}
+
+.chart-metric-toggle {
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #68788b;
+  padding: .38rem .65rem;
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+.chart-metric-toggle.active {
+  background: #ffffff;
+  color: #1269d3;
+  box-shadow: 0 2px 8px rgba(15, 39, 66, .08);
+}

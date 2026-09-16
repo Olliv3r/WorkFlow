@@ -3,9 +3,10 @@ from app.models import Production
 def serialize_production(production: Production) -> dict:
     return {
         "id": production.id,
+        "date": production.date.isoformat() if production.date else None,
         "dozens": production.dozens,
-        "price_per_dozen": production.price_per_dozen,
-        "total_amount": production.total_amount,
+        "price_per_dozen": str(production.price_per_dozen),
+        "total_amount": str(production.total_amount),
         "observation": production.observation,
         "product_id": production.product_id,
         "stage_id": production.stage_id,

@@ -11,15 +11,6 @@
         novo pagamento.
       </p>
     </div>
-    <button
-      type="button"
-      class="btn btn-settle"
-      data-bs-toggle="collapse"
-      data-bs-target="#filterCard"
-    >
-      <i class="bi bi-plus-lg"></i>
-      Novo Pagamento
-    </button>
   </div>
 
   <!-- ========== CARD DE FILTRO ========== -->
@@ -28,7 +19,19 @@
       <i class="bi bi-funnel"></i> Localizar produções
     </div>
 
-    <form method="GET">
+    {# TODO: action real quando payment.filter existir. Mesmo padrão
+       de production/productions.html — o form existe para refletir
+       o estado na URL; o JS intercepta o submit e busca via fetch. #}
+    <div class="d-flex flex-wrap gap-2 mb-3 quick-periods">
+      <button type="button" class="btn btn-filter-clear" data-quick="today">Hoje</button>
+      <button type="button" class="btn btn-filter-clear" data-quick="this_week">Esta semana</button>
+      <button type="button" class="btn btn-filter-clear" data-quick="last_week">Semana passada</button>
+      <button type="button" class="btn btn-filter-clear" data-quick="last_15">Últimos 15 dias</button>
+      <button type="button" class="btn btn-filter-clear" data-quick="this_month">Este mês</button>
+      <button type="button" class="btn btn-filter-clear" data-quick="all">Tudo pendente</button>
+    </div>
+
+    <form method="GET" id="formPaymentFilter">
       <div class="row g-3 align-items-end">
         <div class="col-md-4">
           <label class="field-label">Data inicial</label>

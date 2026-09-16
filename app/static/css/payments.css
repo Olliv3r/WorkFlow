@@ -448,3 +448,5 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .table-productions tbody tr { transition: none; }
 }
+
+.btn-payment-details{display:inline-flex;align-items:center;gap:.35rem;text-decoration:none;border:1px solid var(--border);background:#fff;color:var(--ink);border-radius:6px;padding:.4rem .65rem;font-size:.78rem;font-weight:600}.btn-payment-details:hover{background:#f7f5f0;color:var(--ink)}

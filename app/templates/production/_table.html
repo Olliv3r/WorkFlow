@@ -32,24 +32,32 @@
       {% for production in productions %}
       <tr>
         <td>{{ production.date.strftime('%d/%m/%Y') }}</td>
-        <td>{{ production.product.family.name }} — {{ production.product.material.name }}</td>
+        <td>{{ production.product.family.name }} — {{ production.product.material.name }} · {{ production.product.hole.quantity }} furos</td>
         <td><span class="stage-badge">{{ production.stage.name }}</span></td>
         <td>{{ production.dozens }}</td>
         <td>R$ {{ "%.2f"|format(production.price_per_dozen)|replace('.', ',') }}</td>
         <td class="cell-total">R$ {{ "%.2f"|format(production.total_amount)|replace('.', ',') }}</td>
         <td>
-          {% if production.payment.status == "paid" %}
+          {% if production.payment and production.payment.status == "paid" %}
           <span class="badge-paid"><i class="bi bi-check-circle-fill"></i> Pago</span>
-          {% elif production.payment.status == "pending" %}
+          {% elif production.payment and production.payment.status == "pending" %}
           <span class="badge-pending"><i class="bi bi-dash-circle"></i> Pendente</span>
           {% else %}
           <span class="badge-pending"><i class="bi bi-dash-circle"></i> Sem pagamento</span>
           {% endif %}
         </td>
         <td class="actions-cell">
+          <a
+            href="{{ url_for('production.details', production_id=production.id) }}"
+            class="btn-icon-action is-view"
+            title="Ver detalhes"
+            aria-label="Ver detalhes da produção"
+          >
+            <i class="bi bi-eye"></i>
+          </a>
           <button
             type="button"
-            class="btn-icon-action"
+            class="btn-icon-action is-edit"
             data-bs-toggle="modal"
             data-bs-target="#modalEditProduction"
             data-production-id="{{ production.id }}"
@@ -59,7 +67,7 @@
             data-production-dozens="{{ production.dozens }}"
             data-production-price="{{ production.price_per_dozen }}"
             data-production-observation="{{ production.observation or '' }}"
-            title="Editar"
+            {% if production.payment %}disabled title="Não é possível editar: já vinculada a um pagamento"{% else %}title="Editar"{% endif %}
           >
             <i class="bi bi-pencil"></i>
           </button>

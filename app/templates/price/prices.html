@@ -1,0 +1,114 @@
+{% from "bootstrap5/utils.html" import render_static %}
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-wrap page-price">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Cadastro de Preço</div>
+      <p class="page-sub">
+        Defina o preço por dúzia de cada combinação produto+etapa.
+        Esse valor preenche automaticamente o formulário de nova
+        produção — editar aqui não altera produções já registradas.
+      </p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title"><i class="bi bi-tag"></i> Definir preço</div>
+
+    <form method="POST" action="{{ url_for('price.set_price') }}" id="formSetPrice">
+      <div class="row g-3 align-items-end">
+
+        <div class="col-md-4">
+          <label class="field-label">Produto<span class="req">*</span></label>
+          <select class="form-select" name="product_id" id="priceProductId" required>
+            <option value="" selected disabled>Selecionar produto</option>
+            {% for product in products %}
+            <option value="{{ product.id }}">
+              {{ product.family.name }} — {{ product.material.name }} · {{ product.hole.quantity }} furos
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="field-label">Etapa<span class="req">*</span></label>
+          <select class="form-select" name="stage_id" id="priceStageId" required>
+            <option value="" selected disabled>Selecionar etapa</option>
+            {% for stage in stages %}
+            <option value="{{ stage.id }}">{{ stage.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="field-label">Preço por dúzia<span class="req">*</span></label>
+          <input type="text" class="form-control" name="price_per_dozen" id="priceValue" required>
+        </div>
+
+        <div class="col-md-1">
+          <button type="submit" id="btnSetPrice" class="btn btn-slate w-100">
+            <i class="bi bi-check-lg"></i>
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+  {% if missing_prices %}
+  <div class="panel mt-4">
+    <div class="panel-title"><i class="bi bi-exclamation-triangle"></i> Preços não configurados ({{ missing_prices|length }})</div>
+    <div class="table-scroll"><table class="table-price"><thead><tr><th>Produto</th><th>Etapa</th></tr></thead><tbody>
+      {% for product, stage in missing_prices %}<tr><td>{{ product.family.name }} — {{ product.material.name }} · {{ product.hole.quantity }} furos</td><td>{{ stage.name }}</td></tr>{% endfor %}
+    </tbody></table></div>
+  </div>
+  {% endif %}
+
+  <div class="modal fade" id="modalEditPrice" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Alterar preço</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <form id="formEditPrice">
+          <div class="modal-body">
+            <input type="hidden" name="product_id" id="editPriceProductId">
+            <input type="hidden" name="stage_id" id="editPriceStageId">
+            <div class="mb-3"><label class="field-label">Produto</label><div id="editPriceProductLabel" class="fw-semibold"></div></div>
+            <div class="mb-3"><label class="field-label">Etapa</label><div id="editPriceStageLabel"></div></div>
+            <div><label class="field-label">Preço por dúzia<span class="req">*</span></label><input class="form-control" name="price_per_dozen" id="editPriceValue" inputmode="decimal" required></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-slate" id="btnEditPrice">Salvar alteração</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel mt-4">
+    <div class="panel-title"><i class="bi bi-table"></i> Preços cadastrados</div>
+    <div class="d-none" id="price_alert"></div>
+    <div id="price-table"></div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+  {{ render_static('css', 'css/price.css') }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script
+  type="module"
+  src="{{ url_for('static', filename='js/modules/price/price.events.js') }}"
+></script>
+{% endblock %}

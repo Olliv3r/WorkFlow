@@ -1,3 +1,15 @@
+"""
+BUG CORRIGIDO: sem `from __future__ import annotations`, a anotação
+`date: date | None = None` quebra em runtime — o nome do campo
+`date` sombreia o `datetime.date` importado, no MESMO passe de
+avaliação da classe (Python resolve anotações com `X | Y` em tempo
+de execução por padrão desde 3.10). O erro real era:
+`TypeError: unsupported operand type(s) for |: 'NoneType' and 'NoneType'`,
+reproduzido isolado antes desta correção. `from __future__ import
+annotations` faz o Python tratar anotações como string (avaliação
+preguiçosa), resolvendo o conflito sem precisar renomear o campo.
+"""
+from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal

@@ -1,0 +1,123 @@
+{% from "bootstrap5/utils.html" import render_static %}
+{% extends "base.html" %}
+{% block content %}
+<div class="page-wrap reports-page">
+  <div class="page-header">
+    <div>
+      <div class="page-kicker">Histórico e tendências</div>
+      <div class="page-title">Relatórios</div>
+      <p class="page-sub">Analise produção por período, produto, etapa e evolução ao longo do tempo.</p>
+    </div>
+    <a class="btn btn-settle" href="{{ url_for('report.export_csv', start_date=request.args.get('start_date',''), end_date=request.args.get('end_date','')) }}"><i class="bi bi-download"></i> Exportar CSV</a>
+  </div>
+
+  <div class="panel mb-4">
+    <div class="panel-title"><i class="bi bi-funnel"></i> Período</div>
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-4"><label class="field-label">Data inicial</label><input class="form-control" type="date" name="start_date" value="{{ request.args.get('start_date','') }}"></div>
+      <div class="col-md-4"><label class="field-label">Data final</label><input class="form-control" type="date" name="end_date" value="{{ request.args.get('end_date','') }}"></div>
+      <div class="col-md-4 d-flex gap-2"><button class="btn btn-filter-primary flex-fill">Aplicar</button><a class="btn btn-filter-clear" href="{{ url_for('report.index') }}">Limpar</a></div>
+    </form>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card"><div><div class="stat-label">Produções</div><div class="stat-value">{{ summary.production_count }}</div></div></div>
+    <div class="stat-card"><div><div class="stat-label">Dúzias</div><div class="stat-value">{{ summary.total_dozens }}</div></div></div>
+    <div class="stat-card"><div><div class="stat-label">Valor produzido</div><div class="stat-value">R$ {{ '%.2f'|format(summary.total_amount)|replace('.', ',') }}</div></div></div>
+    <div class="stat-card"><div><div class="stat-label">A receber (pagamentos)</div><div class="stat-value">R$ {{ '%.2f'|format(pending_total_amount)|replace('.', ',') }}</div></div></div>
+  </div>
+
+  <div class="analytics-compare-grid mt-4">
+    <div class="compare-card">
+      <div class="compare-label">Dúzias · período atual</div>
+      <div class="compare-value">{{ comparison.current.total_dozens }}</div>
+      <div class="compare-meta">Anterior: {{ comparison.previous.total_dozens }} dz</div>
+      {% if comparison.dozens_change is none %}
+        <span class="compare-badge neutral">Sem base anterior</span>
+      {% elif comparison.dozens_change > 0 %}
+        <span class="compare-badge positive"><i class="bi bi-arrow-up-right"></i> {{ '%.1f'|format(comparison.dozens_change)|replace('.', ',') }}%</span>
+      {% elif comparison.dozens_change < 0 %}
+        <span class="compare-badge negative"><i class="bi bi-arrow-down-right"></i> {{ '%.1f'|format(comparison.dozens_change|abs)|replace('.', ',') }}%</span>
+      {% else %}
+        <span class="compare-badge neutral">Sem variação</span>
+      {% endif %}
+    </div>
+    <div class="compare-card">
+      <div class="compare-label">Valor · período atual</div>
+      <div class="compare-value">R$ {{ '%.2f'|format(comparison.current.total_amount)|replace('.', ',') }}</div>
+      <div class="compare-meta">Anterior: R$ {{ '%.2f'|format(comparison.previous.total_amount)|replace('.', ',') }}</div>
+      {% if comparison.amount_change is none %}
+        <span class="compare-badge neutral">Sem base anterior</span>
+      {% elif comparison.amount_change > 0 %}
+        <span class="compare-badge positive"><i class="bi bi-arrow-up-right"></i> {{ '%.1f'|format(comparison.amount_change)|replace('.', ',') }}%</span>
+      {% elif comparison.amount_change < 0 %}
+        <span class="compare-badge negative"><i class="bi bi-arrow-down-right"></i> {{ '%.1f'|format(comparison.amount_change|abs)|replace('.', ',') }}%</span>
+      {% else %}
+        <span class="compare-badge neutral">Sem variação</span>
+      {% endif %}
+    </div>
+    <div class="compare-period-card">
+      <small>Comparação equivalente</small>
+      <strong>{{ comparison.current_start.strftime('%d/%m/%Y') }} — {{ comparison.current_end.strftime('%d/%m/%Y') }}</strong>
+      <span>vs.</span>
+      <strong>{{ comparison.previous_start.strftime('%d/%m/%Y') }} — {{ comparison.previous_end.strftime('%d/%m/%Y') }}</strong>
+    </div>
+  </div>
+
+  <div class="panel mt-4 analytics-panel">
+    <div class="panel-heading-row">
+      <div>
+        <div class="panel-title"><i class="bi bi-graph-up"></i> Produção ao longo do tempo</div>
+        <p class="panel-subtitle">A escala muda automaticamente entre dia, mês e ano conforme o período escolhido.</p>
+      </div>
+      <div class="analytics-heading-actions">
+        <span class="analytics-granularity">{{ {'day':'Diário','month':'Mensal','year':'Anual'}[trend.granularity] }}</span>
+        <div class="chart-metric-switch" aria-label="Métrica do gráfico">
+          <button type="button" class="chart-metric-toggle active" data-chart-target="reportTrendChart" data-value-key="dozens" data-value-label="dúzias">Dúzias</button>
+          <button type="button" class="chart-metric-toggle" data-chart-target="reportTrendChart" data-value-key="amount" data-value-prefix="R$">Valor</button>
+        </div>
+      </div>
+    </div>
+    <div id="reportTrendChart" class="wf-chart wf-line-chart" data-chart-source="reportTrendData" data-value-key="dozens" data-value-label="dúzias"></div>
+    <script type="application/json" id="reportTrendData">{{ trend|tojson }}</script>
+  </div>
+
+  <div class="row g-4 mt-1">
+    <div class="col-xl-7">
+      <div class="panel h-100 analytics-panel">
+        <div class="panel-title"><i class="bi bi-box-seam"></i> Produtos mais produzidos</div>
+        <p class="panel-subtitle">Ranking por quantidade de dúzias no período.</p>
+        <div class="wf-chart wf-bar-chart" data-chart-source="productChartData" data-value-label="dz"></div>
+        <script type="application/json" id="productChartData">{{ product_chart|tojson }}</script>
+      </div>
+    </div>
+    <div class="col-xl-5">
+      <div class="panel h-100 analytics-panel">
+        <div class="panel-title"><i class="bi bi-diagram-3"></i> Produção por etapa</div>
+        <p class="panel-subtitle">Volume de trabalho acumulado por etapa.</p>
+        <div class="wf-chart wf-bar-chart" data-chart-source="stageChartData" data-value-label="dz"></div>
+        <script type="application/json" id="stageChartData">{{ stage_chart|tojson }}</script>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel mt-4"><div class="panel-title"><i class="bi bi-box"></i> Por produto</div>
+    <div class="table-scroll"><table class="table-productions"><thead><tr><th>Produto</th><th>Registros</th><th>Dúzias</th><th>Valor</th></tr></thead><tbody>
+    {% for product, dozens, amount, count in by_product %}<tr><td>{{ product.family.name }} — {{ product.material.name }} · {{ product.hole.quantity }} furos</td><td>{{ count }}</td><td>{{ dozens }}</td><td>R$ {{ '%.2f'|format(amount)|replace('.', ',') }}</td></tr>{% else %}<tr><td colspan="4">Sem dados no período.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </div>
+
+  <div class="row g-4 mt-1">
+    <div class="col-lg-6"><div class="panel h-100"><div class="panel-title"><i class="bi bi-diagram-3"></i> Por etapa</div><div class="table-scroll"><table class="table-productions"><thead><tr><th>Etapa</th><th>Dúzias</th><th>Valor</th></tr></thead><tbody>{% for stage, dozens, amount, count in by_stage %}<tr><td>{{ stage.name }}</td><td>{{ dozens }}</td><td>R$ {{ '%.2f'|format(amount)|replace('.', ',') }}</td></tr>{% else %}<tr><td colspan="3">Sem dados.</td></tr>{% endfor %}</tbody></table></div></div></div>
+    <div class="col-lg-6"><div class="panel h-100"><div class="panel-title"><i class="bi bi-calendar3"></i> Por dia</div><div class="table-scroll"><table class="table-productions"><thead><tr><th>Data</th><th>Dúzias</th><th>Valor</th></tr></thead><tbody>{% for day, dozens, amount, count in by_day %}<tr><td>{{ day.strftime('%d/%m/%Y') }}</td><td>{{ dozens }}</td><td>R$ {{ '%.2f'|format(amount)|replace('.', ',') }}</td></tr>{% else %}<tr><td colspan="3">Sem dados.</td></tr>{% endfor %}</tbody></table></div></div></div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_css %}
+{{ render_static('css', 'css/payments.css') }}
+{{ render_static('css', 'css/production.css') }}
+{{ render_static('css', 'css/analytics.css') }}
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/modules/report/analytics.js') }}"></script>
+{% endblock %}

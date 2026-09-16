@@ -63,7 +63,24 @@
 
             <div class="col-md-4">
               <label class="field-label">Preço por dúzia<span class="req">*</span></label>
+              {#
+                TODO (JS): ao mudar newProductionProductId ou
+                newProductionStageId, com os dois preenchidos, chamar
+                GET /price/current?product_id=X&stage_id=Y (já
+                implementado e testado, ver app/price/views.py).
+
+                Resposta: {status, found, price_per_dozen}. Se
+                found=true, preencher este campo com price_per_dozen
+                e marcar readonly (o preço vem da tabela, edição vai
+                em /price/, não aqui). Se found=false, garantir que o
+                campo NÃO está readonly — sem preço cadastrado para
+                esta combinação, digitação manual é o fallback
+                esperado, não um erro.
+              #}
               <input type="text" class="form-control" name="price_per_dozen" id="newProductionPrice" required>
+              <div class="d-none price-auto-hint" id="newProductionPriceHint">
+                <i class="bi bi-info-circle"></i> Preço da tabela — para alterar, use Cadastro de Preço.
+              </div>
             </div>
 
             <div class="col-md-4">

@@ -41,7 +41,7 @@
       <div class="stat-label">Sem Pagamento</div>
       <div class="stat-value">
         {{ unpaid_count }}
-        <span class="stat-value-sub">R$ {#{{ "%.2f"|format(unpaid_amount)|replace('.', ',') }}#}</span>
+        <span class="stat-value-sub">R$ {{ "%.2f"|format(unpaid_amount)|replace('.', ',') }}</span>
       </div>
     </div>
   </div>

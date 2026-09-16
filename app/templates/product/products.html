@@ -1,0 +1,32 @@
+{% from "bootstrap5/utils.html" import render_static %}
+{% extends "base.html" %}
+{% block content %}
+<div class="page-wrap">
+  <div class="page-header">
+    <div><div class="page-title">Produtos</div><p class="page-sub">Cadastre produtos e desative os que não devem mais aparecer em novas produções.</p></div>
+    <button class="btn btn-settle" data-bs-toggle="modal" data-bs-target="#modalNewProduct"><i class="bi bi-plus-lg"></i> Novo produto</button>
+  </div>
+  <div class="panel"><div class="panel-title"><i class="bi bi-box-seam"></i> Produtos cadastrados</div>
+    <div id="product-alert" class="d-none"></div>
+    <div class="table-scroll"><table class="table-productions"><thead><tr><th>Família</th><th>Material</th><th>Qualidade</th><th>Furos</th><th>Taco</th><th>Status</th><th>Ação</th></tr></thead><tbody>
+      {% for p in products %}<tr><td>{{ p.family.name }}</td><td>{{ p.material.name }}</td><td>{{ p.quality.name if p.quality else '—' }}</td><td>{{ p.hole.quantity }}</td><td>{{ p.stick_type.name }}</td><td>{% if p.active %}<span class="badge-paid">Ativo</span>{% else %}<span class="badge-pending">Inativo</span>{% endif %}</td><td><button class="btn-toggle-product btn-toggle-status {{ 'is-paid' if p.active else 'is-pending' }}" data-product-id="{{ p.id }}">{{ 'Desativar' if p.active else 'Ativar' }}</button></td></tr>{% else %}<tr><td colspan="7">Nenhum produto cadastrado.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalNewProduct" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Novo produto</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form id="formNewProduct"><div class="modal-body"><div id="new-product-alert" class="d-none"></div><div class="row g-3">
+    <div class="col-md-6"><label class="field-label">Família</label><select class="form-select" name="family_id" required><option value="">Selecionar</option>{% for x in families %}<option value="{{ x.id }}">{{ x.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-6"><label class="field-label">Material</label><select class="form-select" name="material_id" required><option value="">Selecionar</option>{% for x in materials %}<option value="{{ x.id }}">{{ x.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-4"><label class="field-label">Furos</label><select class="form-select" name="hole_id" required><option value="">Selecionar</option>{% for x in holes %}<option value="{{ x.id }}">{{ x.quantity }}</option>{% endfor %}</select></div>
+    <div class="col-md-4"><label class="field-label">Taco</label><select class="form-select" name="stick_type_id" required><option value="">Selecionar</option>{% for x in sticks %}<option value="{{ x.id }}">{{ x.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-4"><label class="field-label">Qualidade</label><select class="form-select" name="quality_id"><option value="">Sem qualidade</option>{% for x in qualities %}<option value="{{ x.id }}">{{ x.name }}</option>{% endfor %}</select></div>
+  </div></div><div class="modal-footer"><button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-fiber">Criar produto</button></div></form>
+</div></div></div>
+{% endblock %}
+{% block extra_scripts %}<script>
+$(document).on('click','.btn-toggle-product',async function(){const b=$(this); const r=await $.post('/product/'+b.data('product-id')+'/toggle-active'); if(r.status==='success') location.reload(); else alert(r.message)});
+$('#formNewProduct').on('submit',async function(e){e.preventDefault(); const r=await $.ajax({url:'/product/create',method:'POST',data:new FormData(this),processData:false,contentType:false}); if(r.status==='success') location.reload(); else {$('#new-product-alert').removeClass('d-none').addClass('alert alert-danger').text(r.message)}});
+</script>{% endblock %}
+{% block extra_css %}{{ render_static('css', 'css/payments.css') }}{{ render_static('css', 'css/production.css') }}{% endblock %}

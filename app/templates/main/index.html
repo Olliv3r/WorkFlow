@@ -1,196 +1,141 @@
-{% from "bootstrap5/utils.html" import render_messages %}
-
-{% extends 'base.html' %}
-
+{% from "bootstrap5/utils.html" import render_static %}
+{% extends "base.html" %}
 {% block content %}
-
-<div class="container py-5" style="max-width: 880px;">
-
-  <div class="sheet-header">Ficha de Produção</div>
-  <div class="sheet-sub">Registro de etapas de fabricação e cadastro de novos produtos</div>
-
-  <ul class="nav sector-tabs" id="productTabs" role="tablist">
-    <li class="nav-item flex-fill" role="presentation">
-      <button
-        class="sector-tab active"
-        data-sector="production"
-        data-bs-toggle="tab"
-        data-bs-target="#production-tab"
-        type="button"
-        role="tab">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
-        Produção
-      </button>
-    </li>
-    <li class="nav-item flex-fill" role="presentation">
-      <button
-        class="sector-tab"
-        data-sector="product"
-        data-bs-toggle="tab"
-        data-bs-target="#product-tab"
-        type="button"
-        role="tab">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg>
-        Novo Produto
-      </button>
-    </li>
-  </ul>
-
-  <div class="tab-content">
-
-    <!-- =========================
-         FORM PRODUÇÃO
-    ========================== -->
-    <div class="tab-pane fade show active sector-panel" data-sector-panel="production" id="production-tab" role="tabpanel">
-
-      <span class="sector-pill wood">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
-        Registro de etapa
-      </span>
-
-      <div class="mx-1">
-	{{ render_messages() }}
-      </div>
-
-      <form method="POST" method="post" action="{{ url_for('main.production_create') }}">
-        <div class="row g-3">
-
-          <!-- Produto -->
-          <div class="col-md-6">
-            <label class="field-label">Produto<span class="req">*</span></label>
-            <select class="form-select" name="product_id" required>
-              <option value="" selected disabled>Selecionar produto</option>
-              {% for product in products %}
-              <option value="{{ product.id }}">
-                {{ product.family.name }} - {{ product.material.name }} - {{ product.hole.quantity }} furos
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Etapa -->
-          <div class="col-md-6">
-            <label class="field-label">Etapa<span class="req">*</span></label>
-            <select class="form-select" name="stage_id" required>
-              <option value="" selected disabled>Selecionar etapa</option>
-              {% for stage in stages %}
-              <option value="{{ stage.id }}">{{ stage.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Quantidade -->
-          <div class="col-md-4">
-            <label class="field-label">Dúzias<span class="req">*</span></label>
-            <input type="number" class="form-control" name="dozens" min="1" required>
-          </div>
-
-	  <!-- Valor por dúzia -->
-          <div class="col-md-4">
-            <label class="field-label">Valor por dúzia<span class="req">*</span></label>
-            <input type="number" class="form-control" name="price_per_dozen" min="1" required>
-          </div>
-
-          <!-- Data -->
-          <div class="col-md-4">
-            <label class="field-label">Data<span class="req">*</span></label>
-            <input type="date" class="form-control" name="date" required>
-          </div>
-
-          <!-- Observação -->
-          <div class="col-md-12">
-            <label class="field-label">Observação</label>
-            <textarea class="form-control" rows="3" name="observation"></textarea>
-          </div>
-
-          <div class="col-12 pt-2">
-            <button class="btn btn-wood">Salvar Produção</button>
-          </div>
-
-        </div>
-      </form>
-
+<div class="page-wrap dashboard-page">
+  <div class="page-header hero-header">
+    <div>
+      <div class="page-kicker">Visão geral</div>
+      <div class="page-title">Dashboard</div>
+      <p class="page-sub">Acompanhe produção, valores e pendências em um só lugar.</p>
     </div>
-
-    <!-- =========================
-         FORM PRODUTO
-    ========================== -->
-    <div class="tab-pane fade sector-panel" data-sector-panel="product" id="product-tab" role="tabpanel">
-
-      <span class="sector-pill fiber">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
-        Cadastro de produto
-      </span>
-
-      <form method="POST">
-        <div class="row g-3">
-
-          <!-- Família -->
-          <div class="col-md-6">
-            <label class="field-label">Família<span class="req">*</span></label>
-            <select class="form-select" name="family_id" required>
-              <option value="" selected disabled>Selecionar família</option>
-              {% for family in families %}
-              <option value="{{ family.id }}">{{ family.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Material -->
-          <div class="col-md-6">
-            <label class="field-label">Material<span class="req">*</span></label>
-            <select class="form-select" name="material_id" required>
-              <option value="" selected disabled>Selecionar material</option>
-              {% for material in materials %}
-              <option value="{{ material.id }}">{{ material.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Furos -->
-          <div class="col-md-4">
-            <label class="field-label">Furos<span class="req">*</span></label>
-            <select class="form-select" name="hole_id" required>
-              <option value="" selected disabled>Selecionar</option>
-              {% for hole in holes %}
-              <option value="{{ hole.id }}">{{ hole.quantity }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Taco -->
-          <div class="col-md-4">
-            <label class="field-label">Taco<span class="req">*</span></label>
-            <select class="form-select" name="stick_type_id" required>
-              <option value="" selected disabled>Selecionar</option>
-              {% for stick in sticks %}
-              <option value="{{ stick.id }}">{{ stick.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Qualidade -->
-          <div class="col-md-4">
-            <label class="field-label">Qualidade</label>
-            <select class="form-select" name="quality_id">
-              <option value="" selected>Sem qualidade</option>
-              {% for quality in qualities %}
-              <option value="{{ quality.id }}">{{ quality.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="col-12 pt-2">
-            <button class="btn btn-fiber">Criar Produto</button>
-          </div>
-
-        </div>
-      </form>
-
-    </div>
-
+    <a class="btn btn-primary-app" href="{{ url_for('production.index') }}">
+      <i class="bi bi-plus-lg"></i> Nova produção
+    </a>
   </div>
 
+  <div class="dashboard-grid dashboard-primary-grid">
+    <div class="dash-card metric-blue">
+      <div class="metric-icon"><i class="bi bi-calendar-check"></i></div>
+      <div class="metric-copy">
+        <span>Produção hoje</span>
+        <strong>{{ today_summary.total_dozens }}</strong>
+        <small>dúzias · R$ {{ '%.2f'|format(today_summary.total_amount)|replace('.', ',') }}</small>
+      </div>
+    </div>
 
+    <div class="dash-card metric-green">
+      <div class="metric-icon"><i class="bi bi-boxes"></i></div>
+      <div class="metric-copy">
+        <span>Esta semana</span>
+        <strong>{{ week_summary.total_dozens }}</strong>
+        <small>dúzias em {{ week_summary.production_count }} registros</small>
+      </div>
+    </div>
+
+    <div class="dash-card metric-amber">
+      <div class="metric-icon"><i class="bi bi-currency-dollar"></i></div>
+      <div class="metric-copy">
+        <span>Valor no mês</span>
+        <strong>R$ {{ '%.2f'|format(month_summary.total_amount)|replace('.', ',') }}</strong>
+        <small>{{ month_summary.total_dozens }} dúzias produzidas</small>
+      </div>
+    </div>
+
+    <div class="dash-card metric-purple">
+      <div class="metric-icon"><i class="bi bi-hourglass-split"></i></div>
+      <div class="metric-copy">
+        <span>Sem pagamento</span>
+        <strong>R$ {{ '%.2f'|format(unpaid.amount)|replace('.', ',') }}</strong>
+        <small>{{ unpaid.count }} produções aguardando</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-secondary-grid">
+    <div class="mini-insight pending-insight">
+      <span class="mini-insight-icon"><i class="bi bi-wallet2"></i></span>
+      <div><small>Pagamentos pendentes</small><strong>R$ {{ '%.2f'|format(pending.amount)|replace('.', ',') }}</strong></div>
+      <span class="mini-insight-meta">{{ pending.count }} fechamento{{ '' if pending.count == 1 else 's' }}</span>
+    </div>
+    <div class="mini-insight paid-insight">
+      <span class="mini-insight-icon"><i class="bi bi-check2-circle"></i></span>
+      <div><small>Pago neste mês</small><strong>R$ {{ '%.2f'|format(paid_month)|replace('.', ',') }}</strong></div>
+      <span class="mini-insight-meta">quitado</span>
+    </div>
+  </div>
+
+  <div class="panel mt-4 analytics-panel">
+    <div class="panel-heading-row">
+      <div>
+        <div class="panel-title"><i class="bi bi-graph-up-arrow"></i> Produção nos últimos 30 dias</div>
+        <p class="panel-subtitle">Evolução diária das dúzias produzidas. Dias sem produção aparecem como zero.</p>
+      </div>
+      <a href="{{ url_for('report.index') }}" class="text-action">Analisar histórico <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="wf-chart wf-line-chart" data-chart-source="dashboardTrendData" data-value-key="dozens" data-value-label="dúzias"></div>
+    <script type="application/json" id="dashboardTrendData">{{ trend|tojson }}</script>
+  </div>
+
+  <div class="row g-4 dashboard-lower-grid">
+    <div class="col-xl-7">
+      <div class="panel h-100 dashboard-panel">
+        <div class="panel-heading-row">
+          <div>
+            <div class="panel-title"><i class="bi bi-trophy-fill"></i> Mais produzidos no mês</div>
+            <p class="panel-subtitle">Produtos com maior volume de dúzias no período atual.</p>
+          </div>
+          <a href="{{ url_for('report.index') }}" class="text-action">Ver relatório <i class="bi bi-arrow-right"></i></a>
+        </div>
+        {% if top_products %}
+        <div class="rank-list">
+          {% for product, dozens in top_products %}
+          <div class="rank-item">
+            <span class="rank-position">{{ loop.index }}</span>
+            <div class="rank-copy">
+              <strong>{{ product.family.name }} — {{ product.material.name }} · {{ product.hole.quantity }} furos</strong>
+              <small>{{ product.stick_type.name }}</small>
+            </div>
+            <strong class="rank-value">{{ dozens }} dz</strong>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}<div class="empty-state"><i class="bi bi-bar-chart"></i><p class="mb-0">Nenhuma produção neste mês.</p></div>{% endif %}
+      </div>
+    </div>
+
+    <div class="col-xl-5">
+      <div class="panel h-100 dashboard-panel">
+        <div class="panel-heading-row">
+          <div>
+            <div class="panel-title"><i class="bi bi-clock-history"></i> Últimos registros</div>
+            <p class="panel-subtitle">Atividade mais recente da produção.</p>
+          </div>
+        </div>
+        {% if recent %}
+        <div class="activity-list">
+          {% for p in recent %}
+          <div class="activity-item">
+            <span class="activity-dot"></span>
+            <div class="activity-copy">
+              <strong>{{ p.product.family.name }} — {{ p.product.material.name }} · {{ p.product.hole.quantity }} furos</strong>
+              <small>{{ p.stage.name }} · {{ p.date.strftime('%d/%m/%Y') }} · {{ p.dozens }} dúzias</small>
+              
+            </div>
+            <span class="activity-value">R$ {{ '%.2f'|format(p.total_amount)|replace('.', ',') }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}<div class="empty-state"><i class="bi bi-inbox"></i><p class="mb-0">Nenhum registro ainda.</p></div>{% endif %}
+      </div>
+    </div>
+  </div>
 </div>
+{% endblock %}
+{% block extra_css %}
+{{ render_static('css', 'css/payments.css') }}
+{{ render_static('css', 'css/dashboard.css') }}
+{{ render_static('css', 'css/analytics.css') }}
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/modules/report/analytics.js') }}"></script>
 {% endblock %}

@@ -181,6 +181,7 @@ body {
   justify-content: center;
   font-size: 1.1rem;
   flex-shrink: 0;
+  text-decoration: none;
 }
 
 .stat-label {
@@ -410,3 +411,13 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .table-productions tbody tr { transition: none; }
 }
+
+.price-auto-hint {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  margin-top: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.price-auto-hint i { color: var(--wood); }

@@ -54,6 +54,9 @@ HOLES = [
         "quantity": 20
     },
     {
+        "quantity": 22
+    },
+    {
         "quantity": 30
     }
 ]
