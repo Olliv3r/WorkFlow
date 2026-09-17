@@ -1,213 +1,243 @@
 # WorkFlow
 
-Sistema web em **Python + Flask** para registrar produções, organizar produtos e etapas, controlar preços e fechar pagamentos de produção.
+![Preview](assets/preview.png)
 
-![WorkFlow — Preview do sistema](assets/preview.png)
+**Versão atual: v0.0.8**
 
-> [!IMPORTANT]
-> ## Sobre a versão da branch principal
->
-> O código disponível atualmente na **branch principal do repositório** ainda representa a versão que foi desenvolvida antes da pausa do projeto e pode não conter todas as correções e funcionalidades descritas nas versões mais recentes.
->
-> **Para obter a versão mais atualizada do WorkFlow, consulte a seção _Releases_ do GitHub e baixe o pacote da release mais recente.**
->
-> A branch principal poderá ser sincronizada com essas versões futuramente.
+O **WorkFlow** é um sistema web em **Python + Flask** criado para registrar produções, organizar produtos e preços, controlar diárias e vales, realizar fechamentos e acompanhar valores recebidos e pendentes.
+
+A versão `v0.0.8` consolida a evolução mais recente do projeto e passa a ser a versão de referência da **branch principal**.
 
 ## Objetivo
 
-O WorkFlow foi criado para substituir anotações e cálculos manuais no acompanhamento de produção. O fluxo principal é simples:
+O sistema foi criado para substituir anotações manuais e cálculos espalhados por um fluxo único e rastreável:
 
 ```text
-Produzir → Registrar → Acompanhar → Fechar pagamento → Analisar
+Trabalho realizado
+      ↓
+Produções + Diárias
+      ↓
+Fechamento
+      ↓
+Vales / abatimentos
+      ↓
+Recebimentos
+      ↓
+Pendências e relatórios
 ```
 
-O projeto continua sendo um **monólito Flask e monousuário**. A prioridade é resolver bem o processo real de produção sem transformar o sistema em um ERP genérico.
+O projeto continua sendo um **monólito Flask e monousuário**, focado no processo real de produção e pagamento.
 
-## Tecnologias
-
-- Python
-- Flask
-- Flask-SQLAlchemy / SQLAlchemy
-- Flask-Migrate / Alembic
-- SQLite (padrão atual)
-- PostgreSQL (suporte opcional via `psycopg`)
-- MySQL (suporte opcional via `PyMySQL`)
-- Bootstrap-Flask / Bootstrap 5
-- Jinja2
-- JavaScript modularizado (ES Modules)
-- jQuery
-
-## Funcionalidades atuais
+## Principais recursos
 
 ### Dashboard
 
-A página inicial apresenta uma visão resumida da produção e dos pagamentos, incluindo indicadores do período atual e atalhos para as áreas principais.
-
-Também inclui um gráfico de **produção dos últimos 30 dias**, com os dias sem produção representados como zero para preservar a leitura real da tendência.
+A tela inicial reúne indicadores e atalhos para as áreas principais do sistema, oferecendo uma visão rápida do trabalho registrado e da situação financeira.
 
 ### Produções
 
 Cada produção registra:
 
+- data;
 - produto;
 - etapa;
-- data;
 - quantidade em dúzias;
 - preço por dúzia;
 - valor total;
 - observação;
-- pagamento relacionado, quando houver.
+- fechamento relacionado, quando houver.
 
-Recursos:
+As etapas usadas atualmente para produção são:
 
-- criação;
-- edição;
-- exclusão;
-- filtros por período e produto;
-- histórico;
-- seleção para fechamento de pagamento;
-- **Ver detalhes da produção**, com produto, furos, etapa, quantidade, preço, total, observação e pagamento relacionado.
+- **Amarração**;
+- **Enchimento**.
 
-#### Integridade de produções vinculadas
+Produções já vinculadas a um fechamento ficam protegidas contra alterações destrutivas que comprometam o histórico financeiro.
 
-Uma `Production` já vinculada a um `Payment` **não pode ser editada nem excluída**. Isso evita alterar as bases de cálculo depois que o pagamento foi fechado.
+### Diárias
 
-Para corrigir uma produção vinculada a um pagamento ainda pendente, o fluxo esperado é:
+Serviços auxiliares são registrados como **Diárias**, separados das produções por dúzia.
 
-1. excluir/desfazer o pagamento pendente;
-2. corrigir a produção;
-3. criar o pagamento novamente.
+Cada diária possui:
+
+- data;
+- período;
+- descrição;
+- valor informado manualmente;
+- observação;
+- fechamento relacionado, quando houver.
+
+O valor é definido por ocorrência. O sistema não força uma diária inteira ou meia diária a seguir um preço fixo global.
 
 ### Produtos
 
-Produtos são formados por características como:
+Os produtos são formados por combinações de:
 
 - família;
 - material;
-- qualidade;
-- quantidade de furos;
+- qualidade, quando aplicável;
+- quantidade de furos, quando aplicável;
 - tipo de taco.
 
-O módulo permite:
+A **Capa Quadrada** não possui furos.
 
-- listar produtos;
-- criar novos produtos;
-- impedir duplicatas equivalentes;
-- ativar/desativar produtos sem apagar o histórico.
+O catálogo padrão atual contempla:
 
-> As combinações específicas de família/material/furos/taco presentes no seed **ainda não são tratadas automaticamente como regras rígidas de domínio**. Elas só devem ser bloqueadas no backend quando essas regras forem formalmente confirmadas.
+| Produto | Furos |
+| --- | --- |
+| Básica | 16 |
+| Extra | 16, 20 e 22 |
+| Inovada | 20 |
+| PET | 16 e 20 |
+| Náilon | 16 e 20 |
+| Cipó | 16 e 20 |
+| Capa Quadrada | Sem furos |
 
-### Etapas
+### Preços
 
-O seed atual cadastra oito etapas:
-
-1. Amarração
-2. Enchimento
-3. Pinação
-4. Pentiação
-5. Aparação
-6. Encabação
-7. Pinação do cabo
-8. Acabamento
-
-> O nome **“Pentiação”** foi mantido exatamente como está no projeto. Uma eventual alteração para “Penteação” deve ser confirmada como regra/nomenclatura do processo antes de modificar dados existentes.
-
-### Tabela de preços
-
-O módulo de preços relaciona:
+A tabela de preços usa a relação:
 
 ```text
 Produto + Etapa → Preço por dúzia
 ```
 
-O preço usado em uma produção é congelado na própria `Production`; alterar a tabela de preços depois **não altera produções antigas**.
+O preço é usado para preencher automaticamente uma nova produção.
 
-No cadastro de uma nova produção:
+Depois que a produção é criada, o preço utilizado fica congelado em `Production.price_per_dozen`. Alterar a tabela de preços não modifica produções antigas.
 
-- se existir preço configurado para `produto + etapa`, o backend usa esse preço como valor vigente;
-- se não existir preço configurado, o comportamento atual preservado é permitir preço manual;
-- nenhum valor padrão é assumido silenciosamente.
+A Capa Quadrada possui preços diferentes por etapa:
 
-O formulário aceita valores com ponto ou vírgula, por exemplo `2.50` e `2,50`. A normalização ocorre no backend antes da criação do `Decimal`.
+- Amarração: **R$ 1,50 por dúzia**;
+- Enchimento: **R$ 2,50 por dúzia**.
 
-> O fallback manual continua existindo por compatibilidade com o fluxo atual. Se futuramente o processo exigir que **toda** combinação possua preço cadastrado, essa regra deve ser confirmada antes de remover o fallback.
+### Cadastros auxiliares
 
-### Pagamentos
+A área de Cadastros centraliza:
 
-Um pagamento agrupa várias produções e registra:
+- Famílias;
+- Materiais;
+- Qualidades;
+- Furos;
+- Tipos de taco;
+- Etapas.
 
-- período inicial e final;
-- total de dúzias;
-- valor total;
-- status (`pending` ou `paid`);
-- data do pagamento;
-- observação.
+O seed usa chaves naturais para evitar duplicação de registros e pode ser executado novamente com segurança.
 
-A relação atual é:
+### Fechamentos
+
+Um fechamento reúne trabalhos selecionados de um período:
 
 ```text
-Payment 1 ─────── N Production
-
-Production.payment_id → payments.id
+Produções selecionadas
++ Diárias selecionadas
+= Valor bruto
+- Vales aplicados
+= Valor líquido a receber
 ```
 
-Cada `Production` possui apenas um `payment_id`, portanto pertence a no máximo um pagamento por vez.
+Os totais são recalculados no backend a partir dos registros persistidos. Valores enviados pelo JavaScript não são tratados como fonte financeira confiável.
 
-Ao criar um pagamento, o backend:
+O fechamento é criado **antes** do recebimento real do dinheiro.
 
-1. recebe os IDs selecionados;
-2. remove IDs duplicados;
-3. busca novamente todas as produções no banco;
-4. rejeita IDs inexistentes;
-5. rejeita produções já vinculadas a outro pagamento;
-6. recalcula `total_dozens` no servidor;
-7. recalcula `total_amount` usando `dozens × price_per_dozen` persistidos;
-8. cria o `Payment` e vincula as produções na mesma operação transacional.
+### Vales
 
-O JavaScript não é considerado fonte confiável para os totais financeiros.
+Os vales preservam o valor original e possuem saldo calculado a partir dos abatimentos já realizados.
 
-Recursos adicionais:
+Status possíveis:
 
-- períodos rápidos de fechamento;
-- observação do pagamento;
-- detalhes das produções que compõem cada pagamento;
-- marcar como pago;
-- reverter para pendente;
-- excluir pagamento pendente e devolver suas produções à fila de fechamento.
+- `pending`: ainda não abatido;
+- `partial`: parcialmente abatido;
+- `discounted`: totalmente abatido.
 
-A interface mantém **somente o botão de criação de pagamento no rodapé** do fluxo de seleção.
+Quando existem pendências, um novo vale possui **três modos**:
 
-### Relatórios e Analytics
+1. **Pagamento pendente mais recente** — aplica o vale somente à pendência mais recente.
+2. **Escolher pagamento** — permite selecionar manualmente qual pendência será afetada.
+3. **Próximo fechamento** — não altera pagamentos pendentes e deixa o vale reservado para um fechamento futuro.
 
-A área de relatórios permite analisar produção por:
+Os três modos exibem confirmação antes da operação.
 
-- período;
-- produto;
-- etapa;
-- dia.
+Quando o vale é maior que a pendência escolhida, o excedente não percorre outras pendências automaticamente. O saldo restante continua aguardando um fechamento futuro.
 
-A camada de Analytics adiciona:
+Vales sem abatimentos podem ser editados ou excluídos. Depois de qualquer abatimento, o histórico fica protegido e não há desfazer da movimentação financeira.
 
-- gráfico de evolução da produção ao longo do tempo, alternando entre dúzias e valor produzido;
-- escala automática diária, mensal ou anual conforme o tamanho do período;
-- ranking visual dos produtos mais produzidos;
-- gráfico de produção por etapa;
-- comparação entre o período atual e um período anterior de mesma duração;
-- preenchimento explícito de períodos sem produção com valor zero, evitando tendências enganosas.
+### Recebimentos e pendências
 
-Os gráficos são renderizados localmente com JavaScript/SVG e **não dependem de CDN ou biblioteca externa de gráficos**, mantendo o WorkFlow utilizável offline.
+O WorkFlow separa dois conceitos:
 
-Também há exportação para **CSV**, útil para Excel, Google Sheets, LibreOffice Calc ou análise com Python/Pandas.
+```text
+Fechamento = quanto foi apurado como devido
+Recebimento = dinheiro efetivamente recebido
+```
 
-### Backup
+Um fechamento pode estar:
 
-Quando o backend é SQLite, o WorkFlow oferece download direto de uma cópia do arquivo do banco.
+- aguardando recebimento;
+- parcialmente recebido;
+- quitado.
 
-Quando estiver conectado a PostgreSQL/MySQL, o botão de backup local é ocultado e o backup deve ser realizado pelo servidor/provedor do banco.
+Recebimentos posteriores podem ser associados a um fechamento conhecido. Quando a origem não é conhecida, o sistema permite registrar o recebimento sem inventar automaticamente qual fechamento ele quitou.
+
+A área de Pendências permite acompanhar os saldos ainda a receber por fechamento.
+
+### Detalhes
+
+As principais rotas seguem o mesmo padrão de consulta com a ação **Detalhes**, incluindo:
+
+- Preços;
+- Cadastros;
+- Produtos;
+- Pendências;
+- Vales;
+- Pagamentos/Fechamentos;
+- Diárias.
+
+### Relatórios e exportação
+
+A área de relatórios permite acompanhar produção e movimentações financeiras por período.
+
+A exportação completa gera um **ZIP** com arquivos CSV separados:
+
+```text
+producoes.csv
+diarias.csv
+fechamentos.csv
+vales.csv
+abatimentos_vales.csv
+recebimentos.csv
+alocacoes_recebimentos.csv
+```
+
+Os relatórios de vales diferenciam:
+
+- abatimento realizado durante um fechamento;
+- vale aplicado posteriormente a uma pendência;
+- saldo restante;
+- vale aguardando fechamento futuro.
+
+A exportação antiga em CSV continua disponível para compatibilidade.
+
+### Backup e atualização do banco
+
+SQLite continua sendo o banco padrão.
+
+Para atualizar uma base existente, use:
+
+```bash
+python scripts/upgrade_database.py
+```
+
+O script:
+
+1. cria uma cópia de segurança do `dev.db` local;
+2. executa as migrations existentes;
+3. interrompe o processo caso o upgrade falhe.
+
+> Para dados reais, mantenha sempre uma cópia externa confiável antes de testar uma nova versão.
 
 ## Arquitetura
 
-O projeto é organizado por módulos de domínio. Em módulos de escrita, o fluxo preferido é:
+O fluxo principal da aplicação segue:
 
 ```text
 HTTP / Form
@@ -222,109 +252,82 @@ Repository
     ↓
 SQLAlchemy
     ↓
-SQLite
+Banco de dados
 ```
 
-Responsabilidades:
+Responsabilidades principais:
 
-- **Views**: HTTP, formulários e respostas;
+- **Views**: requisições HTTP, formulários e respostas;
 - **DTOs/parsers**: conversão e validação de entrada;
-- **Services**: regras de negócio e integridade;
+- **Services**: regras de negócio e transações;
 - **Repositories**: persistência e consultas;
 - **Models**: estrutura persistida e relacionamentos.
 
-As consultas analíticas do Dashboard e de Relatórios são centralizadas em `ReportService` e `ReportRepository`, mantendo as views responsáveis principalmente por HTTP e renderização.
+## Tecnologias
+
+- Python
+- Flask
+- Flask-SQLAlchemy / SQLAlchemy
+- Flask-Migrate / Alembic
+- SQLite
+- PostgreSQL opcional
+- MySQL opcional
+- Jinja2
+- Bootstrap 5 / Bootstrap-Flask
+- JavaScript modularizado
+- jQuery
 
 ## Estrutura resumida
 
 ```text
 WorkFlow/
 ├── app/
+│   ├── advance/
+│   ├── daily_work/
 │   ├── main/
-│   ├── production/
 │   ├── payment/
-│   ├── product/
 │   ├── price/
+│   ├── product/
+│   ├── production/
+│   ├── registry/
 │   ├── report/
-│   ├── stage/
-│   ├── hole/
 │   ├── seed/
-│   ├── common/
-│   ├── core/
 │   ├── models/
 │   ├── templates/
 │   └── static/
-├── tests/
 ├── migrations/
+├── scripts/
+│   └── upgrade_database.py
+├── tests/
 ├── assets/
 ├── config.py
 ├── main.py
-├── requirements.txt
-├── requirements-dev.txt
-├── requirements-postgresql.txt
-├── requirements-mysql.txt
-├── DATABASES.md
 ├── server.sh
 └── README.md
 ```
 
-## Bancos de dados
-
-O WorkFlow continua usando **SQLite por padrão**, mas a conexão agora é configurável por `DATABASE_URL`.
-
-### SQLite
-
-Nenhuma configuração adicional é necessária.
-
-### PostgreSQL
-
-```bash
-pip install -r requirements-postgresql.txt
-export DATABASE_URL='postgresql://usuario:senha@host:5432/workflow'
-flask db upgrade
-```
-
-### MySQL
-
-```bash
-pip install -r requirements-mysql.txt
-export DATABASE_URL='mysql://usuario:senha@host:3306/workflow'
-flask db upgrade
-```
-
-URLs comuns são normalizadas para os drivers suportados pelo projeto (`psycopg` e `PyMySQL`). URLs explícitas do SQLAlchemy continuam aceitas.
-
-> A compatibilidade de conexão **não migra automaticamente o conteúdo do `dev.db`**. A transferência de dados para outro SGBD deverá ser executada e validada quando a migração realmente acontecer. Consulte [`DATABASES.md`](DATABASES.md).
-
-### Índices para histórico longo
-
-A migration mais recente adiciona índices para as principais consultas históricas em:
-
-- `Production.date`;
-- `Production.product_id`;
-- `Production.stage_id`;
-- `Production.payment_id`;
-- datas e status de `Payment`.
-
-Esses índices não alteram regras nem valores; existem para manter relatórios eficientes conforme o histórico crescer.
-
 ## Instalação
+
+Clone o projeto:
 
 ```bash
 git clone https://github.com/Olliv3r/WorkFlow.git
 cd WorkFlow
-python -m venv .venv
 ```
 
-Linux / Termux / macOS:
+Crie e ative um ambiente virtual Python.
+
+Linux, Termux ou macOS:
 
 ```bash
-source .venv/bin/activate
+python -m venv ~/venv-wf
+source ~/venv-wf/bin/activate
 ```
 
 Windows:
 
 ```powershell
+python -m venv .venv
 .venv\Scripts\activate
 ```
 
@@ -334,46 +337,66 @@ Instale as dependências:
 pip install -r requirements.txt
 ```
 
-Aplique as migrations quando necessário:
+Aplique as migrations:
 
 ```bash
-flask db upgrade
+python scripts/upgrade_database.py
 ```
 
-Popule um banco vazio com os dados iniciais:
+Popule os dados iniciais:
 
 ```bash
 ./server.sh seed
 ```
 
-Execute:
+Inicie o servidor:
 
 ```bash
 ./server.sh flask run --debug
 ```
 
-> `server.sh` usa por padrão o ambiente virtual configurado na variável `VENV`. Ajuste esse caminho ao seu ambiente local se necessário.
+> O caminho do ambiente virtual usado por `server.sh` pode ser ajustado na variável `VENV` do próprio script.
+
+## Seed
+
+O seed atual exibe o resultado de cada categoria processada:
+
+```text
+Famílias
+Materiais
+Qualidades
+Furos
+Tipos de taco
+Etapas
+Produtos
+Preços
+```
+
+Ele cadastra apenas registros ausentes e preserva preços existentes que tenham sido alterados posteriormente.
+
+## Outros bancos de dados
+
+A conexão pode ser configurada pela variável `DATABASE_URL`.
+
+### PostgreSQL
+
+```bash
+pip install -r requirements-postgresql.txt
+export DATABASE_URL='postgresql://usuario:senha@host:5432/workflow'
+python scripts/upgrade_database.py
+```
+
+### MySQL
+
+```bash
+pip install -r requirements-mysql.txt
+export DATABASE_URL='mysql://usuario:senha@host:3306/workflow'
+python scripts/upgrade_database.py
+```
+
+A configuração de outro SGBD não transfere automaticamente os dados existentes do SQLite. Consulte [`DATABASES.md`](DATABASES.md) antes de uma migração real.
 
 ## Testes
-
-A versão atual inclui testes automatizados para:
-
-- seed em banco vazio e idempotência de `create_stages()`;
-- parsing de datas;
-- valores monetários com `2.50`, `2,50`, vazio, texto, zero e negativo;
-- criação de produção;
-- edição de produção;
-- edição e validação da data;
-- exclusão;
-- bloqueio de edição/exclusão quando já há pagamento;
-- uso do preço configurado no backend na criação;
-- fallback manual quando não existe preço configurado;
-- criação de pagamentos em intervalos semanais, quinzenais e mensais;
-- tentativa de pagamento duplicado;
-- recálculo de dúzias e valores no backend;
-- filtros rápidos de pagamento;
-- presença das principais telas;
-- ausência do antigo botão superior de pagamento.
 
 Instale as dependências de desenvolvimento:
 
@@ -387,51 +410,28 @@ Execute:
 python -m pytest -q
 ```
 
-Ou execute a verificação de release, que também valida a sintaxe Python e os módulos JavaScript principais:
+Para a verificação de release:
 
 ```bash
 ./scripts/verify_release.sh
 ```
 
-## Seed
+## Versão v0.0.8
 
-O seed completo executa, nesta ordem:
+Esta versão consolida na branch principal as evoluções de domínio e interface desenvolvidas após a versão anterior, incluindo:
 
-```text
-Famílias
-→ Materiais
-→ Qualidades
-→ Furos
-→ Tipos de taco
-→ Etapas
-→ Produtos
-```
-
-O `stage_repository` utilizado por `SeedService.create_stages()` é importado de `app.stage.repositories`, onde a instância é exposta pelo `__init__.py`.
-
-## Decisões que ainda precisam de confirmação de domínio
-
-As seguintes mudanças **não foram impostas automaticamente** nesta versão:
-
-- restringir combinações permitidas da família Inovada;
-- restringir combinações da Capa quadrada;
-- definir todas as combinações válidas de PET, Náilon e Cipó;
-- transformar o conteúdo do seed em regra rígida de validação;
-- remover totalmente o preço manual quando não existe preço cadastrado;
-- renomear “Pentiação”;
-- adicionar novas etapas apenas porque estavam planejadas.
-
-Essas decisões devem ser confirmadas com base no processo real antes de virar validação de backend.
-
-## Estado da versão
-
-A linha de desenvolvimento desta atualização reforça primeiro integridade e testes antes de adicionar mais funcionalidades.
-
-Para acompanhar os itens auditados e os pontos ainda pendentes, consulte `CHECKLIST_v0.0.3.md` incluído no pacote da release.
-
-## Releases
-
-**A versão mais atualizada é distribuída pela seção Releases.** Enquanto a branch principal não for sincronizada, baixar/clonar apenas `main` pode entregar uma versão anterior à apresentada neste README.
+- diárias com valor manual;
+- separação entre fechamento e recebimento;
+- controle de pendências;
+- vales com histórico de abatimentos e três modos de destino;
+- catálogo e preços atualizados;
+- Capa Quadrada sem furos;
+- produção limitada a Amarração e Enchimento;
+- exportação financeira completa;
+- telas de Detalhes padronizadas;
+- seed idempotente incluindo preços;
+- correções de navegação mobile;
+- atualização segura do banco com backup prévio.
 
 ## Licença
 
