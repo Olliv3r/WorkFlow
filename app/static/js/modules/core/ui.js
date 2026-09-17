@@ -65,7 +65,7 @@ export const UI = {
     const options = data.map(item => 
       $("<option>", {
         value: item.id,
-        text: item.entity !== "stage" ? (item.display_name || `${item.family_name} - ${item.material_name} - ${item.hole_quantity} furos`) : item.name,
+        text: item.entity !== "stage" ? (item.display_name || `${item.family_name} - ${item.material_name}${item.hole_quantity == null ? "" : ` - ${item.hole_quantity} furos`}`) : item.name,
         selected: item.id === defaultId
       })
     )

@@ -165,7 +165,7 @@ class ReportService:
         rows = report_repository.by_product(start_date, end_date, limit=limit)
         return [
             {
-                "label": f"{product.family.name} — {product.material.name} · {product.hole.quantity} furos",
+                "label": f"{product.family.name} — {product.material.name}" + (f" · {product.hole.quantity} furos" if product.hole else ""),
                 "value": int(dozens or 0),
             }
             for product, dozens, _amount, _count in rows

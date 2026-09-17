@@ -49,13 +49,14 @@ def cards_partial():
     daily_works = ps.get_daily_works(start_date, end_date)
     summary = ps.get_unpaid_summary(start_date, end_date)
     start_period, end_period = ps.get_period(start_date, end_date)
+    daily_total = sum((d.total_amount for d in daily_works), 0)
 
     return jsonify(render_template(
         "payment/_cards_partial.html",
         productions=productions,
         daily_works=daily_works,
         total_dozens=summary.total_dozens,
-        total_amount=summary.total_amount,
+        total_amount=summary.total_amount + daily_total,
         start_period=start_period,
         end_period=end_period,
     ))
@@ -83,8 +84,8 @@ def create():
         daily_ids = [int(value) for value in request.form.getlist("daily_work_ids")]
     except (TypeError, ValueError):
         raise ValidationError("IDs de diária inválidos")
-    ps.payment_create(ids, request.form.get("observation"), daily_ids)
-    return jsonify(status="success", message="Pagamento criado com sucesso")
+    payment = ps.payment_create(ids, request.form.get("observation"), daily_ids)
+    return jsonify(status="success", message="Fechamento criado com sucesso")
 
 
 @bp.route("/<int:payment_id>/delete", methods=["POST"])
@@ -102,4 +103,25 @@ def toggle_status(payment_id):
         id=payment.id,
         payment_status=payment.status,
         payment_date=payment.payment_date.isoformat() if payment.payment_date else None,
+    )
+
+
+@bp.route("/receipt/create", methods=["POST"])
+def receipt_create():
+    payment_id = request.form.get("payment_id") or None
+    receipt = ps.register_receipt(
+        request.form.get("amount"),
+        request.form.get("date"),
+        request.form.get("observation"),
+        payment_id,
+    )
+    return jsonify(status="success", message="Recebimento registrado com sucesso", id=receipt.id)
+
+
+@bp.route("/receivables", methods=["GET"])
+def receivables():
+    payments = ps.get_payments()
+    return render_template(
+        "payment/receivables.html", title="Pendências e recebimentos",
+        payments=payments, receipts=ps.get_receipts(), summary=ps.get_receivables_summary()
     )

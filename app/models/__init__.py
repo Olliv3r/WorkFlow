@@ -11,3 +11,5 @@ from app.models.stick_type import StickType
 from app.models.daily_work import DailyWork
 from app.models.advance import Advance
 from app.models.advance_deduction import AdvanceDeduction
+from app.models.receipt import Receipt
+from app.models.receipt_allocation import ReceiptAllocation

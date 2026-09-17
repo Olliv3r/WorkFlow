@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}
+<div class="page-wrap"><div class="page-header"><div><div class="page-title">Detalhes — {{ label }}</div><p class="page-sub">Informações do cadastro #{{ item.id }}.</p></div><a href="{{ url_for('registry.manage', kind=kind) }}" class="btn btn-outline-secondary">Voltar</a></div>
+<div class="panel"><p><strong>ID:</strong> {{ item.id }}</p><p><strong>Cadastro:</strong> {{ item.quantity ~ ' furos' if kind=='holes' else item.name }}</p>{% if item.description is defined %}<p><strong>Descrição:</strong> {{ item.description or '—' }}</p>{% endif %}{% if kind=='stages' %}<p><strong>Ordem:</strong> {{ item.order }}</p>{% endif %}{% if item.active is defined %}<p><strong>Status:</strong> {{ 'Ativo' if item.active else 'Inativo' }}</p>{% endif %}</div></div>
+{% endblock %}

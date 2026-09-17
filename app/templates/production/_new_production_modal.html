@@ -40,7 +40,7 @@
                 <option value="" selected disabled>Selecionar produto</option>
                 {% for product in products %}
                 <option value="{{ product.id }}">
-                  {{ product.family.name }} - {{ product.material.name }} - {{ product.hole.quantity }} furos
+                  {{ product.family.name }} - {{ product.material.name }} - {% if product.hole %}{{ product.hole.quantity }} furos{% else %}Sem furos{% endif %}
                 </option>
                 {% endfor %}
               </select>

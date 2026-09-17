@@ -53,6 +53,13 @@ class ProductService:
         return product_repository.all(order_by="id", descending=True)
 
     @staticmethod
+    def get_product_entity(product_id: int):
+        product = product_repository.filter_by(id=product_id).first()
+        if product is None:
+            raise NotFoundError("Produto não encontrado")
+        return product
+
+    @staticmethod
     def toggle_active(product_id: int):
         product = product_repository.filter_by(id=product_id).first()
         if product is None:
@@ -74,9 +81,16 @@ class ProductService:
         if not material:
             raise NotFoundError("Material não encontrado")
 
-        hole = hole_repository.filter_by(id=dto.hole_id).first()
-        if not hole:
-            raise NotFoundError("Quantidade de furos não encontrada")
+        if family.name == "Capa Quadrada":
+            if dto.hole_id is not None:
+                raise ValidationError("Capa Quadrada não possui furos")
+            hole = None
+        else:
+            if dto.hole_id is None:
+                raise ValidationError("Quantidade de furos é obrigatória para este produto")
+            hole = hole_repository.filter_by(id=dto.hole_id).first()
+            if not hole:
+                raise NotFoundError("Quantidade de furos não encontrada")
 
         stick_type = stick_repository.filter_by(id=dto.stick_type_id).first()
         if not stick_type:

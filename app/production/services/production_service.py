@@ -14,7 +14,7 @@ class ProductionService:
     
     @staticmethod
     def get_stages():
-        return stage_repository.filter_by(active=True).order_by(stage_repository.model.order.asc()).all()
+        return stage_repository.filter_by(active=True).filter(stage_repository.model.name.in_(["Amarração", "Enchimento"])).order_by(stage_repository.model.order.asc()).all()
 
     @staticmethod
     def get_families():
@@ -80,8 +80,8 @@ class ProductionService:
 
         if not stage:
             raise NotFoundError("Não existe etapa para este produto")
-        if not stage.active:
-            raise ValidationError("Etapa está inativa")
+        if not stage.active or stage.name not in ("Amarração", "Enchimento"):
+            raise ValidationError("Produções usam apenas as etapas Amarração ou Enchimento; os demais serviços pertencem a Diárias")
       
         # A interface já trata o preço cadastrado em Price como o valor
         # vigente da combinação produto+etapa. Repetimos essa decisão no
@@ -163,8 +163,8 @@ class ProductionService:
 
         if stage is None:
             raise NotFoundError("Etapa não encontrada para essa produção")
-        if not stage.active:
-            raise ValidationError("Etapa está inativa")
+        if not stage.active or stage.name not in ("Amarração", "Enchimento"):
+            raise ValidationError("Produções usam apenas as etapas Amarração ou Enchimento; os demais serviços pertencem a Diárias")
 
         production = ProductionMapper.to_entity(production, dto)
 

@@ -23,6 +23,15 @@ def manage(kind):
     items = model.query.order_by(model.id).all()
     return render_template("registry/index.html", title="Cadastros", kind=kind, label=label, items=items, model=model)
 
+
+@bp.route("/<kind>/<int:item_id>/details")
+def details(kind, item_id):
+    model, label = get_cfg(kind)
+    item = db.session.get(model, item_id)
+    if not item:
+        raise NotFoundError("Registro não encontrado")
+    return render_template("registry/details.html", title="Detalhes do cadastro", kind=kind, label=label, item=item)
+
 @bp.route("/<kind>/save", methods=["POST"])
 def save(kind):
     model, _ = get_cfg(kind); item_id=request.form.get("id"); item=db.session.get(model, int(item_id)) if item_id else model()

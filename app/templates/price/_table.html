@@ -12,13 +12,14 @@
     <tbody>
       {% for price in prices %}
       <tr>
-        <td>{{ price.product.family.name }} — {{ price.product.material.name }} · {{ price.product.hole.quantity }} furos</td>
+        <td>{{ price.product.family.name }} — {{ price.product.material.name }} · {% if price.product.hole %}{{ price.product.hole.quantity }} furos{% else %}Sem furos{% endif %}</td>
         <td><span class="stage-badge">{{ price.stage.name }}</span></td>
         <td class="cell-total">R$ {{ "%.2f"|format(price.price_per_dozen)|replace('.', ',') }}</td>
         <td class="text-end">
+          <a href="{{ url_for('price.details', price_id=price.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i> Detalhes</a>
           <button type="button" class="btn btn-sm btn-outline-primary btn-edit-price"
                   data-product-id="{{ price.product_id }}" data-stage-id="{{ price.stage_id }}"
-                  data-product-label="{{ price.product.family.name }} — {{ price.product.material.name }} · {{ price.product.hole.quantity }} furos"
+                  data-product-label="{{ price.product.family.name }} — {{ price.product.material.name }} · {% if price.product.hole %}{{ price.product.hole.quantity }} furos{% else %}Sem furos{% endif %}"
                   data-stage-label="{{ price.stage.name }}" data-price="{{ price.price_per_dozen }}">
             <i class="bi bi-pencil"></i> Alterar
           </button>

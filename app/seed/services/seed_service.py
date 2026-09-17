@@ -76,86 +76,59 @@ class SeedService:
 
     @staticmethod
     def create_products():
+        from decimal import Decimal
         for item in PRODUCTS:
-            family = family_repository.filter_by(
-                name=item['family']
-            ).first()
-
-            if family is None:
-                raise ValueError("A família do produto não foi encontrada")
-
-            material = material_repository.filter_by(
-                name=item['material']
-            ).first()
-
-            if material is None:
-                raise ValueError("O material do produto não foi encontrado")
-
-            quality = quality_repository.filter_by(
-                name=item['quality']
-            ).first()
-
-            hole = hole_repository.filter_by(
-                quantity=item['hole']
-            ).first()
-
-            if hole is None:
-                raise ValueError("Os furos do produto não foi encontrado")
-
-            stick_type = stick_repository.filter_by(
-                name=item['stick_type']
-            ).first() 
-
-            if stick_type is None:
-                raise ValueError('Os tipos de tacos do produto não existem')
-
-            product_existing = product_repository.filter_by(
-                family=family,
-                material=material,
-                quality=quality,
-                hole=hole,
-                stick_type=stick_type
-            ).first()
-
-            if product_existing:
-                continue
-
-            product_new = Product(
-                family=family,
-                material=material,
-                quality=quality,
-                hole=hole,
-                stick_type=stick_type
-            )
-
-            product_repository.add(product_new)
-
-        # EXTRA 22/30 inherit the real EXTRA 20 combination instead of
-        # duplicating assumptions about material, quality or stick type.
-        extra_family = family_repository.filter_by(name="Extra").first()
-        hole20 = hole_repository.filter_by(quantity=20).first()
-        if extra_family and hole20:
-            source = product_repository.filter_by(family=extra_family, hole=hole20).first()
-            if source:
-                for quantity in (22, 30):
-                    target_hole = hole_repository.filter_by(quantity=quantity).first()
-                    if target_hole is None:
-                        raise ValueError(f"Furos {quantity} não encontrados")
-                    existing = product_repository.filter_by(
-                        family=source.family, material=source.material, quality=source.quality,
-                        hole=target_hole, stick_type=source.stick_type).first()
-                    if not existing:
-                        existing = Product(family=source.family, material=source.material, quality=source.quality,
-                            hole=target_hole, stick_type=source.stick_type)
-                        product_repository.add(existing)
-                        product_repository.session.flush()
-                    source_prices = price_repository.filter_by(product_id=source.id).all()
-                    for source_price in source_prices:
-                        price_exists = price_repository.filter_by(product_id=existing.id, stage_id=source_price.stage_id).first()
-                        if not price_exists:
-                            price_repository.add(Price(product_id=existing.id, stage_id=source_price.stage_id,
-                                price_per_dozen=source_price.price_per_dozen))
+            family = family_repository.filter_by(name=item["family"]).first()
+            material = material_repository.filter_by(name=item["material"]).first()
+            quality = quality_repository.filter_by(name=item["quality"]).first() if item["quality"] else None
+            hole = hole_repository.filter_by(quantity=item["hole"]).first() if item["hole"] is not None else None
+            stick_type = stick_repository.filter_by(name=item["stick_type"]).first()
+            if not family or not material or (item["hole"] is not None and not hole) or not stick_type:
+                raise ValueError(f"Cadastro base ausente para produto {item['family']}")
+            query = product_repository.filter_by(family=family, material=material, quality=quality, stick_type=stick_type)
+            query = query.filter(Product.hole_id == (hole.id if hole else None))
+            product = query.first()
+            if not product:
+                product = Product(family=family, material=material, quality=quality, hole=hole, stick_type=stick_type)
+                product_repository.add(product); product_repository.session.flush()
+            product.active = True
 
         return product_repository.commit()
 
-    
+    @staticmethod
+    def create_prices():
+        """Cadastra apenas preços ausentes.
+
+        O seed nunca sobrescreve um preço que o usuário já alterou. Produções
+        históricas também continuam com price_per_dozen congelado.
+        """
+        from decimal import Decimal
+        created = 0
+        for (family_name, hole_qty), stage_prices in DEFAULT_PRICES.items():
+            family = family_repository.filter_by(name=family_name).first()
+            if not family:
+                continue
+            q = product_repository.filter_by(family=family)
+            if hole_qty is None:
+                q = q.filter(Product.hole_id.is_(None))
+            else:
+                hole = hole_repository.filter_by(quantity=hole_qty).first()
+                if not hole:
+                    continue
+                q = q.filter(Product.hole_id == hole.id)
+            product = q.first()
+            if not product:
+                continue
+            for stage_name, value in stage_prices.items():
+                stage = stage_repository.filter_by(name=stage_name).first()
+                if not stage:
+                    continue
+                row = price_repository.filter_by(product_id=product.id, stage_id=stage.id).first()
+                if row is None:
+                    price_repository.add(Price(
+                        product_id=product.id, stage_id=stage.id,
+                        price_per_dozen=Decimal(value)
+                    ))
+                    created += 1
+        price_repository.commit()
+        return created

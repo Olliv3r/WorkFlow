@@ -21,7 +21,7 @@ class CreateBaseDTO:
 class ProductCreateDTO(CreateBaseDTO):
     family_id: int
     material_id: int
-    hole_id: int
+    hole_id: Optional[int]
     stick_type_id: int
     quality_id: Optional[int] = None
 
@@ -29,7 +29,7 @@ class ProductCreateDTO(CreateBaseDTO):
         return (
             isinstance(self.family_id, int)
             and isinstance(self.material_id, int)
-            and isinstance(self.hole_id, int)
+            and (self.hole_id is None or isinstance(self.hole_id, int))
             and isinstance(self.stick_type_id, int)
             and (self.quality_id is None or isinstance(self.quality_id, int))
         )

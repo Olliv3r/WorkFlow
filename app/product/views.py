@@ -33,6 +33,12 @@ def index():
     )
 
 
+@bp.route("/<int:product_id>/details", methods=["GET"])
+def details(product_id):
+    product = ps.get_product_entity(product_id)
+    return render_template("product/details.html", title="Detalhes do produto", product=product)
+
+
 @bp.route("/options", methods=["GET"])
 def get_options():
     return jsonify(status="success", message="Dados de produtos encontrados", data=ps.get_products())
@@ -44,7 +50,7 @@ def create():
     dto = ProductCreateDTO.from_form(
         family_id=_required_int(form, "family_id"),
         material_id=_required_int(form, "material_id"),
-        hole_id=_required_int(form, "hole_id"),
+        hole_id=_optional_int(form, "hole_id"),
         stick_type_id=_required_int(form, "stick_type_id"),
         quality_id=_optional_int(form, "quality_id"),
     )

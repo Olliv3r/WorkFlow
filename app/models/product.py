@@ -31,10 +31,10 @@ class Product(db.Model):
         back_populates="products"
     )
 
-    hole_id: Mapped[int] = mapped_column(
+    hole_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("holes.id")
     )
-    hole: Mapped["Hole"] = relationship(
+    hole: Mapped[Optional["Hole"]] = relationship(
         back_populates="products"
     )
 

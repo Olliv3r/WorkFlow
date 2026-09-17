@@ -24,3 +24,27 @@ class Payment(db.Model):
     productions: Mapped[List["Production"]] = relationship(back_populates="payment")
     daily_works: Mapped[List["DailyWork"]] = relationship(back_populates="payment")
     advance_deductions: Mapped[List["AdvanceDeduction"]] = relationship(back_populates="payment", cascade="all, delete-orphan")
+    receipt_allocations: Mapped[List["ReceiptAllocation"]] = relationship(back_populates="payment", cascade="all, delete-orphan")
+
+    @property
+    def received_amount(self):
+        return sum((item.amount for item in self.receipt_allocations), Decimal("0.00"))
+
+    @property
+    def receivable_advance_amount(self):
+        return sum((item.amount for item in self.advance_deductions if getattr(item, "kind", "closing") == "receivable"), Decimal("0.00"))
+
+    @property
+    def pending_amount(self):
+        # Deduções feitas no fechamento já reduziram net_amount. Somente vales
+        # posteriores (kind=receivable) reduzem novamente o saldo a receber.
+        remaining = self.net_amount - self.received_amount - self.receivable_advance_amount
+        return remaining if remaining > 0 else Decimal("0.00")
+
+    @property
+    def receipt_status(self):
+        if self.pending_amount <= 0:
+            return "paid"
+        if self.received_amount > 0:
+            return "partial"
+        return "pending"

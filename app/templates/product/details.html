@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}
+<div class="page-wrap"><div class="page-header"><div><div class="page-title">Detalhes do produto #{{ product.id }}</div><p class="page-sub">Composição e situação atual do produto.</p></div><a href="{{ url_for('product.index') }}" class="btn btn-outline-secondary">Voltar</a></div>
+<div class="panel"><p><strong>Família:</strong> {{ product.family.name }}</p><p><strong>Material:</strong> {{ product.material.name }}</p><p><strong>Qualidade:</strong> {{ product.quality.name if product.quality else '—' }}</p><p><strong>Furos:</strong> {% if product.hole %}{{ product.hole.quantity }} furos{% else %}Sem furos{% endif %}</p><p><strong>Tipo de taco:</strong> {{ product.stick_type.name }}</p><p><strong>Status:</strong> {{ 'Ativo' if product.active else 'Inativo' }}</p><p><strong>Produções vinculadas:</strong> {{ product.productions|length }}</p></div></div>
+{% endblock %}

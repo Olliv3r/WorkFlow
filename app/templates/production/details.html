@@ -43,7 +43,7 @@
       <table class="table-productions">
         <tbody>
           <tr><th>Data</th><td>{{ production.date.strftime('%d/%m/%Y') }}</td></tr>
-          <tr><th>Produto</th><td>{{ production.product.family.name }} — {{ production.product.material.name }} · {{ production.product.hole.quantity }} furos</td></tr>
+          <tr><th>Produto</th><td>{{ production.product.family.name }} — {{ production.product.material.name }} · {% if production.product.hole %}{{ production.product.hole.quantity }} furos{% endif %}</td></tr>
           <tr><th>Qualidade</th><td>{{ production.product.quality.name if production.product.quality else '—' }}</td></tr>
           <tr><th>Tipo de taco</th><td>{{ production.product.stick_type.name }}</td></tr>
           <tr><th>Etapa</th><td>{{ production.stage.name }}</td></tr>

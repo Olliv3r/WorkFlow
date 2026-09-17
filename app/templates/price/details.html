@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}
+<div class="page-wrap"><div class="page-header"><div><div class="page-title">Detalhes do preço #{{ price.id }}</div><p class="page-sub">Informações da combinação de produto, etapa e preço vigente.</p></div><a href="{{ url_for('price.index') }}" class="btn btn-outline-secondary">Voltar</a></div>
+<div class="panel"><p><strong>Produto:</strong> {{ price.product.family.name }} — {{ price.product.material.name }}</p><p><strong>Furos:</strong> {% if price.product.hole %}{{ price.product.hole.quantity }} furos{% else %}Sem furos{% endif %}</p><p><strong>Qualidade:</strong> {{ price.product.quality.name if price.product.quality else '—' }}</p><p><strong>Taco:</strong> {{ price.product.stick_type.name }}</p><p><strong>Etapa:</strong> {{ price.stage.name }}</p><p><strong>Preço por dúzia:</strong> R$ {{ '%.2f'|format(price.price_per_dozen)|replace('.', ',') }}</p></div></div>
+{% endblock %}

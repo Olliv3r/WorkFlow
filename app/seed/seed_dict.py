@@ -55,9 +55,6 @@ HOLES = [
     },
     {
         "quantity": 22
-    },
-    {
-        "quantity": 30
     }
 ]
 PIACABA_QUALITIES = [
@@ -97,178 +94,37 @@ STICK_TYPES = [
     }
 ]
 STAGES = [
-    {
-        "name": "Amarração",
-        "order": 1
-    },
-    {
-        "name": "Enchimento",
-        "order": 2
-    },
-    {
-        "name": "Pinação",
-        "order": 3
-    },
-    {
-        "name": "Pentiação",
-        "order": 4
-    },
-    {
-        "name": "Aparação",
-        "order": 5
-    },
-    {
-        "name": "Encabação",
-        "order": 6
-    },
-    {
-        "name": "Pinação do cabo",
-        "order": 7
-    },
-    {
-        "name": "Acabamento",
-        "order": 8
-    }
+    {"name": "Amarração", "order": 1},
+    {"name": "Enchimento", "order": 2},
 ]
 PRODUCTS = [
-
-    # ==========================
-    # BÁSICA
-    # ==========================
-
-    {
-        "family": "Básica",
-        "material": "Piaçaba",
-        "quality": "Média",
-        "hole": 16,
-        "stick_type": "Taco padrão"
-    },
-
-
-    # ==========================
-    # EXTRA
-    # ==========================
-
-    {
-        "family": "Extra",
-        "material": "Piaçaba",
-        "quality": "Boa",
-        "hole": 20,
-        "stick_type": "Taco padrão lixado"
-    },
-
-
-    # ==========================
-    # INOVADA
-    # ==========================
-
-    {
-        "family": "Inovada",
-        "material": "Piaçaba",
-        "quality": "Premium",
-        "hole": 20,
-        "stick_type": "Taco especial"
-    },
-
-
-    # ==========================
-    # CAPA QUADRADA
-    # ==========================
-
-    {
-        "family": "Capa Quadrada",
-        "material": "Piaçaba",
-        "quality": "Premium",
-        "hole": 20,
-        "stick_type": "Taco plástico"
-    },
-
-
-    # ==========================
-    # PET
-    # ==========================
-
-    {
-        "family": "PET",
-        "material": "PET",
-        "quality": None,
-        "hole": 16,
-        "stick_type": "Taco padrão"
-    },
-
-    {
-        "family": "PET",
-        "material": "PET",
-        "quality": None,
-        "hole": 20,
-        "stick_type": "Taco padrão"
-    },
-
-    {
-        "family": "PET",
-        "material": "PET",
-        "quality": None,
-        "hole": 30,
-        "stick_type": "Taco padrão"
-    },
-
-
-    # ==========================
-    # NAILON
-    # ==========================
-
-    {
-        "family": "Nailon",
-        "material": "Nailon",
-        "quality": None,
-        "hole": 16,
-        "stick_type": "Taco simples"
-    },
-
-    {
-        "family": "Nailon",
-        "material": "Nailon",
-        "quality": None,
-        "hole": 20,
-        "stick_type": "Taco simples"
-    },
-
-    {
-        "family": "Nailon",
-        "material": "Nailon",
-        "quality": None,
-        "hole": 30,
-        "stick_type": "Taco simples"
-    },
-
-
-    # ==========================
-    # CIPÓ
-    # ==========================
-
-    {
-        "family": "Cipó",
-        "material": "Cipó",
-        "quality": None,
-        "hole": 16,
-        "stick_type": "Taco padrão"
-    },
-
-    {
-        "family": "Cipó",
-        "material": "Cipó",
-        "quality": None,
-        "hole": 20,
-        "stick_type": "Taco padrão"
-    },
-
-    {
-        "family": "Cipó",
-        "material": "Cipó",
-        "quality": None,
-        "hole": 30,
-        "stick_type": "Taco padrão"
-    },
-
+    {"family":"Básica","material":"Piaçaba","quality":"Média","hole":16,"stick_type":"Taco padrão"},
+    {"family":"Extra","material":"Piaçaba","quality":"Boa","hole":16,"stick_type":"Taco padrão lixado"},
+    {"family":"Extra","material":"Piaçaba","quality":"Boa","hole":20,"stick_type":"Taco padrão lixado"},
+    {"family":"Extra","material":"Piaçaba","quality":"Boa","hole":22,"stick_type":"Taco padrão lixado"},
+    {"family":"Inovada","material":"Piaçaba","quality":"Premium","hole":20,"stick_type":"Taco especial"},
+    {"family":"Capa Quadrada","material":"Piaçaba","quality":"Premium","hole":None,"stick_type":"Taco plástico"},
+    {"family":"PET","material":"PET","quality":None,"hole":16,"stick_type":"Taco padrão"},
+    {"family":"PET","material":"PET","quality":None,"hole":20,"stick_type":"Taco padrão"},
+    {"family":"Nailon","material":"Nailon","quality":None,"hole":16,"stick_type":"Taco simples"},
+    {"family":"Nailon","material":"Nailon","quality":None,"hole":20,"stick_type":"Taco simples"},
+    {"family":"Cipó","material":"Cipó","quality":None,"hole":16,"stick_type":"Taco padrão"},
+    {"family":"Cipó","material":"Cipó","quality":None,"hole":20,"stick_type":"Taco padrão"},
 ]
 
+# Current price per dozen. Both production stages share the same price,
+# except Capa Quadrada. Historical Production.price_per_dozen is untouched.
+DEFAULT_PRICES = {
+    ("Básica", 16): {"Amarração": "2.00", "Enchimento": "2.00"},
+    ("Extra", 16): {"Amarração": "2.00", "Enchimento": "2.00"},
+    ("Extra", 20): {"Amarração": "2.50", "Enchimento": "2.50"},
+    ("Extra", 22): {"Amarração": "3.00", "Enchimento": "3.00"},
+    ("Inovada", 20): {"Amarração": "2.50", "Enchimento": "2.50"},
+    ("PET", 16): {"Amarração": "4.00", "Enchimento": "4.00"},
+    ("PET", 20): {"Amarração": "5.00", "Enchimento": "5.00"},
+    ("Nailon", 16): {"Amarração": "2.00", "Enchimento": "2.00"},
+    ("Nailon", 20): {"Amarração": "2.50", "Enchimento": "2.50"},
+    ("Cipó", 16): {"Amarração": "2.50", "Enchimento": "2.50"},
+    ("Cipó", 20): {"Amarração": "3.00", "Enchimento": "3.00"},
+    ("Capa Quadrada", None): {"Amarração": "1.50", "Enchimento": "2.50"},
+}

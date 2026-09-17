@@ -3,13 +3,13 @@ export const PaymentUI = {
     let totalDozens = 0;
     let totalAmount = 0;
 
-    $(".form-check-input:checked").each(function () {
+    $("#formPaymentCreate .payment-item-check:checked, .payment-item-check[form='formPaymentCreate']:checked").each(function () {
       totalDozens += Number($(this).data("dozens"));
       totalAmount += Number($(this).data("amount"));
     });
 
     $("#formPaymentCreate #total_dozens").text(totalDozens);
-    $("#formPaymentCreate #total_amount").text(totalAmount.toFixed(2));
+    $("#formPaymentCreate #total_amount").text("R$ " + totalAmount.toFixed(2).replace(".", ","));
   },
 
   updateButton(status, date, button) {

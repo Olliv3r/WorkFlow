@@ -92,7 +92,7 @@
           <div class="rank-item">
             <span class="rank-position">{{ loop.index }}</span>
             <div class="rank-copy">
-              <strong>{{ product.family.name }} — {{ product.material.name }} · {{ product.hole.quantity }} furos</strong>
+              <strong>{{ product.family.name }} — {{ product.material.name }} · {% if product.hole %}{{ product.hole.quantity }} furos{% else %}Sem furos{% endif %}</strong>
               <small>{{ product.stick_type.name }}</small>
             </div>
             <strong class="rank-value">{{ dozens }} dz</strong>
@@ -117,7 +117,7 @@
           <div class="activity-item">
             <span class="activity-dot"></span>
             <div class="activity-copy">
-              <strong>{{ p.product.family.name }} — {{ p.product.material.name }} · {{ p.product.hole.quantity }} furos</strong>
+              <strong>{{ p.product.family.name }} — {{ p.product.material.name }} · {% if p.product.hole %}{{ p.product.hole.quantity }} furos{% endif %}</strong>
               <small>{{ p.stage.name }} · {{ p.date.strftime('%d/%m/%Y') }} · {{ p.dozens }} dúzias</small>
               
             </div>

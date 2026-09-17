@@ -32,7 +32,7 @@
       {% for production in productions %}
       <tr>
         <td>{{ production.date.strftime('%d/%m/%Y') }}</td>
-        <td>{{ production.product.family.name }} — {{ production.product.material.name }} · {{ production.product.hole.quantity }} furos</td>
+        <td>{{ production.product.family.name }} — {{ production.product.material.name }} · {% if production.product.hole %}{{ production.product.hole.quantity }} furos{% endif %}</td>
         <td><span class="stage-badge">{{ production.stage.name }}</span></td>
         <td>{{ production.dozens }}</td>
         <td>R$ {{ "%.2f"|format(production.price_per_dozen)|replace('.', ',') }}</td>

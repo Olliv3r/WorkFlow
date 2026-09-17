@@ -173,6 +173,13 @@
     display: flex;
   }
 
+  /* Com o drawer aberto, o próprio menu ocupa essa região. O botão deixa
+     de ficar sobreposto à sidebar; o fechamento continua pelo overlay ou
+     ao navegar por um item. */
+  .sidebar-toggle-state:checked + .sidebar-hamburger {
+    display: none;
+  }
+
   .app-sidebar {
     transform: translateX(-100%);
     transition: transform 0.2s ease;

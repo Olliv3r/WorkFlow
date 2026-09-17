@@ -11,6 +11,7 @@ from decimal import Decimal, InvalidOperation
 # app.production.repositories (que também o re-exporta e criaria o
 # mesmo risco de ciclo já resolvido em product_service.py).
 from app.product.repositories.product_repository import ProductRepository
+from app.price.repositories import price_repository
 
 product_repository = ProductRepository()
 stage_repository = StageRepository()
@@ -42,6 +43,14 @@ def table_partial():
             prices=prices
         )
     )
+
+
+@bp.route("/<int:price_id>/details", methods=["GET"])
+def details(price_id):
+    price = price_repository.filter_by(id=price_id).first()
+    if price is None:
+        raise NotFoundError("Preço não encontrado")
+    return render_template("price/details.html", title="Detalhes do preço", price=price)
 
 
 # Definir ou atualizar o preço de uma combinação produto+etapa

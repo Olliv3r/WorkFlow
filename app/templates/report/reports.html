@@ -8,7 +8,7 @@
       <div class="page-title">Relatórios</div>
       <p class="page-sub">Analise produção por período, produto, etapa e evolução ao longo do tempo.</p>
     </div>
-    <a class="btn btn-settle" href="{{ url_for('report.export_csv', start_date=request.args.get('start_date',''), end_date=request.args.get('end_date','')) }}"><i class="bi bi-download"></i> Exportar CSV</a>
+    <a class="btn btn-settle" href="{{ url_for('report.export_financial_zip', start_date=request.args.get('start_date',''), end_date=request.args.get('end_date','')) }}"><i class="bi bi-download"></i> Exportar dados</a>
   </div>
 
   <div class="panel mb-4">
@@ -103,7 +103,7 @@
 
   <div class="panel mt-4"><div class="panel-title"><i class="bi bi-box"></i> Por produto</div>
     <div class="table-scroll"><table class="table-productions"><thead><tr><th>Produto</th><th>Registros</th><th>Dúzias</th><th>Valor</th></tr></thead><tbody>
-    {% for product, dozens, amount, count in by_product %}<tr><td>{{ product.family.name }} — {{ product.material.name }} · {{ product.hole.quantity }} furos</td><td>{{ count }}</td><td>{{ dozens }}</td><td>R$ {{ '%.2f'|format(amount)|replace('.', ',') }}</td></tr>{% else %}<tr><td colspan="4">Sem dados no período.</td></tr>{% endfor %}
+    {% for product, dozens, amount, count in by_product %}<tr><td>{{ product.family.name }} — {{ product.material.name }} · {% if product.hole %}{{ product.hole.quantity }} furos{% else %}Sem furos{% endif %}</td><td>{{ count }}</td><td>{{ dozens }}</td><td>R$ {{ '%.2f'|format(amount)|replace('.', ',') }}</td></tr>{% else %}<tr><td colspan="4">Sem dados no período.</td></tr>{% endfor %}
     </tbody></table></div>
   </div>
 

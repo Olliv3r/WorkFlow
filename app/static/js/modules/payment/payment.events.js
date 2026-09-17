@@ -9,7 +9,7 @@ $(document).ready(function() {
   // Calcular produção
   $("#cards").on(
     "change", 
-    ".form-check-input",
+    ".payment-item-check",
     function() {
       PaymentActions.handleUpdateSummary()
     }

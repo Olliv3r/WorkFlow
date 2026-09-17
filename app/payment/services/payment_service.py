@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 from app.core.exceptions import NotFoundError, ValidationError, PermissionError, ConflictError
 from app.payment.repositories import *
-from app.models import Payment, DailyWork, Advance, AdvanceDeduction
+from app.models import Payment, DailyWork, Advance, AdvanceDeduction, ReceiptAllocation
 from app.extensions import db
 from sqlalchemy import func
 
@@ -34,15 +34,12 @@ class PaymentService:
 
     @staticmethod
     def get_period(start_date=None, end_date=None):
-        query = production_repository.filter_by(payment_id=None)
-        if start_date is not None:
-            query = query.filter(production_repository.model.date >= start_date)
-        if end_date is not None:
-            query = query.filter(production_repository.model.date <= end_date)
-        productions = query.all()
-        if not productions:
+        productions = PaymentService.get_productions(start_date, end_date)
+        daily_works = PaymentService.get_daily_works(start_date, end_date)
+        dates = [p.date for p in productions] + [d.date for d in daily_works]
+        if not dates:
             return None, None
-        return min(p.date for p in productions), max(p.date for p in productions)
+        return min(dates), max(dates)
 
     @staticmethod
     def get_daily_works(start_date=None, end_date=None):
@@ -57,8 +54,14 @@ class PaymentService:
         daily_work_ids = list(dict.fromkeys(daily_work_ids or []))
         if not ids and not daily_work_ids:
             raise ValidationError("Selecione pelo menos uma produção ou diária")
-        productions = production_repository.filter_by_ids(ids).all() if ids else []
-        daily_works = DailyWork.query.filter(DailyWork.id.in_(daily_work_ids)).all() if daily_work_ids else []
+        # The POSTed checkbox IDs are the only source of truth. Never rebuild
+        # a closing from all unpaid rows in the period.
+        productions = production_repository.filter_by_ids(ids).filter(
+            production_repository.model.payment_id.is_(None)
+        ).all() if ids else []
+        daily_works = DailyWork.query.filter(
+            DailyWork.id.in_(daily_work_ids), DailyWork.payment_id.is_(None)
+        ).all() if daily_work_ids else []
         if len(productions) != len(ids) or len(daily_works) != len(daily_work_ids):
             raise NotFoundError("Uma ou mais remunerações não foram encontradas")
         if any(p.payment_id is not None for p in productions) or any(d.payment_id is not None for d in daily_works):
@@ -70,7 +73,7 @@ class PaymentService:
         gross = production_total + daily_total
         payment = Payment(start_period=min(dates), end_period=max(dates), total_dozens=total_dozens,
             total_amount=gross, gross_amount=gross, advance_amount=Decimal("0.00"), net_amount=gross,
-            observation=(observation or "").strip() or None)
+            status="closed", observation=(observation or "").strip() or None)
         try:
             payment_repository.add(payment); db.session.flush()
             for p in productions: p.payment = payment
@@ -84,7 +87,7 @@ class PaymentService:
                 if remaining <= 0: break
                 amount = min(advance.balance, remaining)
                 if amount > 0:
-                    db.session.add(AdvanceDeduction(advance=advance, payment=payment, amount=amount))
+                    db.session.add(AdvanceDeduction(advance=advance, payment=payment, amount=amount, kind="closing"))
                     deducted += amount; remaining -= amount
             payment.advance_amount = deducted
             payment.net_amount = gross - deducted
@@ -97,12 +100,14 @@ class PaymentService:
     @staticmethod
     def payment_delete(payment_id: int) -> bool:
         payment = PaymentService.get_payment(payment_id)
-        if payment.status != "pending":
-            raise PermissionError("Não é possível excluir um pagamento já pago")
+        if payment.receipt_allocations:
+            raise PermissionError("Não é possível excluir um fechamento que já possui recebimentos. O histórico financeiro está protegido.")
 
         try:
             for production in payment.productions:
                 production.payment_id = None
+            for daily_work in payment.daily_works:
+                daily_work.payment_id = None
             payment_repository.delete(payment)
             payment_repository.commit()
         except Exception:
@@ -112,13 +117,69 @@ class PaymentService:
 
     @staticmethod
     def toggle_status(payment_id: int):
-        payment = PaymentService.get_payment(payment_id)
-        if payment.status == "pending":
-            payment.status = "paid"
-            payment.payment_date = date.today()
-        elif payment.status == "paid":
-            raise PermissionError("Pagamento pago é histórico consolidado e não pode voltar para pendente")
-        else:
-            raise ValidationError("Status inválido de pagamento")
-        payment_repository.commit()
-        return payment
+        raise ValidationError("O status agora é calculado pelos recebimentos. Registre o valor efetivamente recebido.")
+
+    @staticmethod
+    def get_receivables_summary():
+        """Resumo financeiro sem inventar FIFO para recebimentos."""
+        from app.models import Receipt
+        payments = Payment.query.order_by(Payment.start_period.asc(), Payment.id.asc()).all()
+        due = sum((p.net_amount for p in payments), Decimal("0.00"))
+        received = db.session.query(func.coalesce(func.sum(Receipt.amount), 0)).scalar() or Decimal("0.00")
+        receivable_advances = sum((p.receivable_advance_amount for p in payments), Decimal("0.00"))
+        balance = due - received - receivable_advances
+        if balance < 0:
+            balance = Decimal("0.00")
+        identified = sum((p.pending_amount for p in payments), Decimal("0.00"))
+        unallocated = db.session.query(func.coalesce(func.sum(Receipt.amount), 0)).scalar() or Decimal("0.00")
+        allocated = db.session.query(func.coalesce(func.sum(ReceiptAllocation.amount), 0)).scalar() or Decimal("0.00")
+        return {
+            "total_due": due,
+            "total_received": received,
+            "balance": balance,
+            "identified_pending": identified,
+            "unallocated_received": max(Decimal("0.00"), unallocated - allocated),
+        }
+
+    @staticmethod
+    def register_receipt(amount, receipt_date=None, observation=None, payment_id=None):
+        from app.models import Receipt, ReceiptAllocation
+        try:
+            amount = Decimal(str(amount).replace(",", "."))
+        except Exception:
+            raise ValidationError("Valor recebido inválido")
+        if amount <= 0:
+            raise ValidationError("O valor recebido deve ser maior que zero")
+        if receipt_date in (None, ""):
+            receipt_date = date.today()
+        elif isinstance(receipt_date, str):
+            try:
+                receipt_date = date.fromisoformat(receipt_date)
+            except ValueError:
+                raise ValidationError("Data de recebimento inválida")
+
+        payment = None
+        if payment_id is not None:
+            payment = PaymentService.get_payment(int(payment_id))
+            if amount > payment.pending_amount:
+                raise ValidationError(
+                    f"Este fechamento possui apenas R$ {payment.pending_amount:.2f} pendentes"
+                )
+
+        receipt = Receipt(date=receipt_date, amount=amount,
+                          observation=(observation or "").strip() or None)
+        try:
+            db.session.add(receipt)
+            db.session.flush()
+            if payment is not None:
+                db.session.add(ReceiptAllocation(receipt=receipt, payment=payment, amount=amount))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+        return receipt
+
+    @staticmethod
+    def get_receipts():
+        from app.models import Receipt
+        return Receipt.query.order_by(Receipt.date.desc(), Receipt.id.desc()).all()

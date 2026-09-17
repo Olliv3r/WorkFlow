@@ -28,7 +28,7 @@
             <option value="" selected disabled>Selecionar produto</option>
             {% for product in products %}
             <option value="{{ product.id }}">
-              {{ product.family.name }} — {{ product.material.name }} · {{ product.hole.quantity }} furos
+              {{ product.family.name }} — {{ product.material.name }} · {% if product.hole %}{{ product.hole.quantity }} furos{% else %}Sem furos{% endif %}
             </option>
             {% endfor %}
           </select>
@@ -63,7 +63,7 @@
   <div class="panel mt-4">
     <div class="panel-title"><i class="bi bi-exclamation-triangle"></i> Preços não configurados ({{ missing_prices|length }})</div>
     <div class="table-scroll"><table class="table-price"><thead><tr><th>Produto</th><th>Etapa</th></tr></thead><tbody>
-      {% for product, stage in missing_prices %}<tr><td>{{ product.family.name }} — {{ product.material.name }} · {{ product.hole.quantity }} furos</td><td>{{ stage.name }}</td></tr>{% endfor %}
+      {% for product, stage in missing_prices %}<tr><td>{{ product.family.name }} — {{ product.material.name }} · {% if product.hole %}{{ product.hole.quantity }} furos{% else %}Sem furos{% endif %}</td><td>{{ stage.name }}</td></tr>{% endfor %}
     </tbody></table></div>
   </div>
   {% endif %}

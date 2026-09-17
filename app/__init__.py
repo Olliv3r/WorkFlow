@@ -41,7 +41,7 @@ def create_app(config=Config):
         }
 
     from app.models import (
-            ProductFamily, Hole, Material, Payment, Product, Production, Quality, Stage, StickType, Price, DailyWork, Advance, AdvanceDeduction
+            ProductFamily, Hole, Material, Payment, Product, Production, Quality, Stage, StickType, Price, DailyWork, Advance, AdvanceDeduction, Receipt, ReceiptAllocation
     )
 
     from app.main import bp as main_bp
