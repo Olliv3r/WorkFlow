@@ -66,3 +66,13 @@ def test_dashboard_uses_production_summary_column_names():
     assert "week_summary.count" not in dashboard
     assert "month_summary.dozens" not in dashboard
     assert "month_summary.amount" not in dashboard
+
+
+def test_receivables_page_supports_multi_payment_allocation():
+    page = Path("app/templates/payment/receivables.html").read_text(encoding="utf-8")
+
+    assert 'name="allocation_payment_ids"' in page
+    assert 'id="selectAllPending"' in page
+    assert 'id="clearPending"' in page
+    assert 'Valor deste recebimento' in page
+    assert 'Sem seleção' in page

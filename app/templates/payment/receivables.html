@@ -1,34 +1,274 @@
-{% from "bootstrap5/utils.html" import render_static %}{% extends "base.html" %}
+{% from "bootstrap5/utils.html" import render_static %}
+{% extends "base.html" %}
+
 {% block content %}
 <div class="page-wrap">
-  <div class="page-header"><div><div class="page-title">Pendências e recebimentos</div><p class="page-sub">Acompanhe o saldo acumulado e preserve a origem conhecida de cada pendência.</p></div><a href="{{ url_for('payment.index') }}" class="btn btn-filter-clear">Pagamentos</a></div>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Pendências e recebimentos</div>
+      <p class="page-sub">Acompanhe o saldo acumulado e preserve a origem conhecida de cada pendência.</p>
+    </div>
+    <a href="{{ url_for('payment.index') }}" class="btn btn-filter-clear">Pagamentos</a>
+  </div>
+
   <div class="stat-row">
     <div class="stat-card"><div><div class="stat-label">Total devido</div><div class="stat-value">R$ {{ '%.2f'|format(summary.total_due)|replace('.', ',') }}</div></div></div>
     <div class="stat-card"><div><div class="stat-label">Total recebido</div><div class="stat-value">R$ {{ '%.2f'|format(summary.total_received)|replace('.', ',') }}</div></div></div>
     <div class="stat-card"><div><div class="stat-label">Saldo a receber</div><div class="stat-value">R$ {{ '%.2f'|format(summary.balance)|replace('.', ',') }}</div></div></div>
   </div>
 
-  <div class="panel mt-4"><div class="panel-title"><i class="bi bi-receipt-cutoff"></i> Pendências por fechamento</div>
-    <div class="table-scroll"><table class="table-history"><thead><tr><th>Fechamento</th><th>Período</th><th>Devido</th><th>Recebido vinculado</th><th>Pendente identificado</th><th>Ação</th></tr></thead><tbody>
-    {% for p in payments if p.pending_amount > 0 %}<tr><td>#{{ p.id }}</td><td>{{ p.start_period.strftime('%d/%m/%Y') }} a {{ p.end_period.strftime('%d/%m/%Y') }}</td><td>R$ {{ '%.2f'|format(p.net_amount)|replace('.', ',') }}</td><td>R$ {{ '%.2f'|format(p.received_amount)|replace('.', ',') }}</td><td class="cell-total">R$ {{ '%.2f'|format(p.pending_amount)|replace('.', ',') }}</td><td><a class="btn-payment-details" href="{{ url_for('payment.details', payment_id=p.id) }}"><i class="bi bi-eye"></i> Detalhes</a></td></tr>{% else %}<tr><td colspan="6">Nenhuma pendência identificada.</td></tr>{% endfor %}
-    </tbody></table></div>
+  <div class="panel mt-4">
+    <div class="panel-title"><i class="bi bi-receipt-cutoff"></i> Pendências por fechamento</div>
+    <div class="table-scroll">
+      <table class="table-history">
+        <thead><tr><th>Fechamento</th><th>Período</th><th>Devido</th><th>Recebido vinculado</th><th>Pendente identificado</th><th>Ação</th></tr></thead>
+        <tbody>
+          {% for p in payments if p.pending_amount > 0 %}
+          <tr>
+            <td>#{{ p.id }}</td>
+            <td>{{ p.start_period.strftime('%d/%m/%Y') }} a {{ p.end_period.strftime('%d/%m/%Y') }}</td>
+            <td>R$ {{ '%.2f'|format(p.net_amount)|replace('.', ',') }}</td>
+            <td>R$ {{ '%.2f'|format(p.received_amount)|replace('.', ',') }}</td>
+            <td class="cell-total">R$ {{ '%.2f'|format(p.pending_amount)|replace('.', ',') }}</td>
+            <td><a class="btn-payment-details" href="{{ url_for('payment.details', payment_id=p.id) }}"><i class="bi bi-eye"></i> Detalhes</a></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6">Nenhuma pendência identificada.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <div class="panel mt-4"><div class="panel-title"><i class="bi bi-cash-stack"></i> Registrar recebimento de pendência</div>
+  <div class="panel mt-4">
+    <div class="panel-title"><i class="bi bi-cash-stack"></i> Registrar recebimento</div>
+    <p class="receipt-help">
+      Selecione um ou mais pagamentos para informar de onde veio o valor. Você pode deixar qualquer pendência de fora e também receber apenas parte dela.
+      Sem seleção, o recebimento fica como <strong>origem não identificada</strong>.
+    </p>
     <div id="receipt_alert" class="d-none"></div>
-    <form id="formReceiptGeneral" action="{{ url_for('payment.receipt_create') }}" method="post"><div class="row g-3 align-items-end">
-      <div class="col-md-3"><label class="field-label">Data</label><input class="form-control" type="date" name="date" required></div>
-      <div class="col-md-3"><label class="field-label">Valor recebido</label><input class="form-control" name="amount" inputmode="decimal" placeholder="0,00" required></div>
-      <div class="col-md-3"><label class="field-label">Origem, se conhecida</label><select class="form-select" name="payment_id"><option value="">Não identificada</option>{% for p in payments if p.pending_amount > 0 %}<option value="{{ p.id }}">#{{ p.id }} — pendente R$ {{ '%.2f'|format(p.pending_amount)|replace('.', ',') }}</option>{% endfor %}</select></div>
-      <div class="col-md-3"><label class="field-label">Observação</label><input class="form-control" name="observation" placeholder="Opcional"></div>
-      <div class="col-12"><button class="btn btn-create-payment" type="submit">Registrar recebimento</button></div>
-    </div></form>
+
+    <form id="formReceiptGeneral" action="{{ url_for('payment.receipt_create') }}" method="post">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="field-label">Data</label>
+          <input class="form-control" type="date" name="date" required>
+        </div>
+        <div class="col-md-3">
+          <label class="field-label">Valor recebido</label>
+          <input id="receiptAmount" class="form-control" name="amount" inputmode="decimal" placeholder="0,00" required>
+        </div>
+        <div class="col-md-6">
+          <label class="field-label">Observação</label>
+          <input class="form-control" name="observation" placeholder="Opcional">
+        </div>
+      </div>
+
+      <div class="receipt-allocation mt-4">
+        <div class="receipt-allocation-head">
+          <div>
+            <div class="receipt-allocation-title">Distribuir entre pendências</div>
+            <div class="receipt-allocation-sub">Marque somente os pagamentos que este recebimento deve abater.</div>
+          </div>
+          <div class="receipt-allocation-actions">
+            <button type="button" id="selectAllPending" class="btn btn-filter-clear">Selecionar todas</button>
+            <button type="button" id="clearPending" class="btn btn-filter-clear">Limpar</button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="table-history receipt-allocation-table">
+            <thead><tr><th></th><th>Pagamento</th><th>Período</th><th>Pendente</th><th>Valor deste recebimento</th></tr></thead>
+            <tbody>
+              {% for p in payments if p.pending_amount > 0 %}
+              <tr>
+                <td>
+                  <input
+                    class="form-check-input allocation-check"
+                    type="checkbox"
+                    name="allocation_payment_ids"
+                    value="{{ p.id }}"
+                    data-payment-id="{{ p.id }}"
+                    data-pending="{{ '%.2f'|format(p.pending_amount) }}"
+                    aria-label="Selecionar pagamento #{{ p.id }}"
+                  >
+                </td>
+                <td><strong>#{{ p.id }}</strong></td>
+                <td>{{ p.start_period.strftime('%d/%m/%Y') }} a {{ p.end_period.strftime('%d/%m/%Y') }}</td>
+                <td>R$ {{ '%.2f'|format(p.pending_amount)|replace('.', ',') }}</td>
+                <td>
+                  <input
+                    class="form-control allocation-amount"
+                    name="allocation_amount_{{ p.id }}"
+                    inputmode="decimal"
+                    placeholder="0,00"
+                    data-payment-id="{{ p.id }}"
+                    disabled
+                  >
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="5">Nenhuma pendência disponível para vincular.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="receipt-allocation-summary">
+          <span>Distribuído: <strong id="allocatedTotal">R$ 0,00</strong></span>
+          <span id="unallocatedLabel">Sem origem: <strong id="unallocatedTotal">R$ 0,00</strong></span>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <button class="btn btn-create-payment" type="submit">Registrar recebimento</button>
+      </div>
+    </form>
   </div>
 
-  <div class="panel mt-4"><div class="panel-title"><i class="bi bi-clock-history"></i> Histórico de recebimentos</div><div class="table-scroll"><table class="table-history"><thead><tr><th>Data</th><th>Valor</th><th>Origem</th><th>Observação</th></tr></thead><tbody>
-    {% for r in receipts %}<tr><td>{{ r.date.strftime('%d/%m/%Y') }}</td><td class="cell-total">R$ {{ '%.2f'|format(r.amount)|replace('.', ',') }}</td><td>{% if r.allocations %}{% for a in r.allocations %}#{{ a.payment_id }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}Não identificada{% endif %}</td><td>{{ r.observation or '—' }}</td></tr>{% else %}<tr><td colspan="4">Nenhum recebimento registrado.</td></tr>{% endfor %}
-  </tbody></table></div></div>
+  <div class="panel mt-4">
+    <div class="panel-title"><i class="bi bi-clock-history"></i> Histórico de recebimentos</div>
+    <div class="table-scroll">
+      <table class="table-history">
+        <thead><tr><th>Data</th><th>Valor</th><th>Origem</th><th>Observação</th></tr></thead>
+        <tbody>
+          {% for r in receipts %}
+          <tr>
+            <td>{{ r.date.strftime('%d/%m/%Y') }}</td>
+            <td class="cell-total">R$ {{ '%.2f'|format(r.amount)|replace('.', ',') }}</td>
+            <td>
+              {% if r.allocations %}
+                {% for a in r.allocations %}
+                  <div>#{{ a.payment_id }} — R$ {{ '%.2f'|format(a.amount)|replace('.', ',') }}</div>
+                {% endfor %}
+                {% if r.unallocated_amount > 0 %}
+                  <div>Sem origem — R$ {{ '%.2f'|format(r.unallocated_amount)|replace('.', ',') }}</div>
+                {% endif %}
+              {% else %}
+                Não identificada
+              {% endif %}
+            </td>
+            <td>{{ r.observation or '—' }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4">Nenhum recebimento registrado.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 {% endblock %}
+
 {% block extra_css %}{{ render_static('css','css/payments.css') }}{% endblock %}
-{% block extra_scripts %}<script>document.addEventListener('DOMContentLoaded',()=>{const f=document.getElementById('formReceiptGeneral');f.addEventListener('submit',async e=>{e.preventDefault();const r=await fetch(f.action,{method:'POST',body:new FormData(f)});const j=await r.json();if(j.status==='success') location.reload(); else alert(j.message||'Erro ao registrar recebimento');});});</script>{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('formReceiptGeneral');
+  const totalInput = document.getElementById('receiptAmount');
+  const checks = [...document.querySelectorAll('.allocation-check')];
+  const allocatedTotal = document.getElementById('allocatedTotal');
+  const unallocatedTotal = document.getElementById('unallocatedTotal');
+  const unallocatedLabel = document.getElementById('unallocatedLabel');
+  const selectAll = document.getElementById('selectAllPending');
+  const clearAll = document.getElementById('clearPending');
+
+  const parseMoney = value => {
+    const parsed = Number.parseFloat(String(value || '').trim().replace(',', '.'));
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  const formatMoney = value => `R$ ${Math.max(0, value).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+  const allocationInput = check => document.querySelector(`.allocation-amount[data-payment-id="${check.dataset.paymentId}"]`);
+
+  function sumAllocations() {
+    return checks.reduce((sum, check) => {
+      if (!check.checked) return sum;
+      return sum + parseMoney(allocationInput(check).value);
+    }, 0);
+  }
+
+  function updateSummary() {
+    const allocated = sumAllocations();
+    const received = parseMoney(totalInput.value);
+    allocatedTotal.textContent = formatMoney(allocated);
+
+    if (allocated > received && received > 0) {
+      const excess = allocated - received;
+      unallocatedLabel.classList.add('allocation-warning');
+      unallocatedLabel.innerHTML = `Excede o recebido: <strong>${formatMoney(excess)}</strong>`;
+    } else {
+      unallocatedLabel.classList.remove('allocation-warning');
+      unallocatedLabel.innerHTML = `Sem origem: <strong id="unallocatedTotal">${formatMoney(received - allocated)}</strong>`;
+    }
+  }
+
+  function setChecked(check, checked, fillPending = false) {
+    check.checked = checked;
+    const input = allocationInput(check);
+    input.disabled = !checked;
+    input.required = checked;
+    if (checked && fillPending && !input.value) {
+      input.value = Number.parseFloat(check.dataset.pending).toFixed(2).replace('.', ',');
+    }
+    if (!checked) input.value = '';
+  }
+
+  totalInput.dataset.autoTotal = totalInput.value ? '0' : '1';
+
+  function syncAutomaticTotal() {
+    if (totalInput.dataset.autoTotal === '1') {
+      const allocated = sumAllocations();
+      totalInput.value = allocated > 0 ? allocated.toFixed(2).replace('.', ',') : '';
+    }
+  }
+
+  checks.forEach(check => {
+    check.addEventListener('change', () => {
+      setChecked(check, check.checked, true);
+      syncAutomaticTotal();
+      updateSummary();
+    });
+    allocationInput(check).addEventListener('input', () => {
+      syncAutomaticTotal();
+      updateSummary();
+    });
+  });
+
+  totalInput.addEventListener('input', () => {
+    totalInput.dataset.autoTotal = '0';
+    updateSummary();
+  });
+
+  selectAll?.addEventListener('click', () => {
+    checks.forEach(check => setChecked(check, true, true));
+    totalInput.dataset.autoTotal = '1';
+    syncAutomaticTotal();
+    updateSummary();
+  });
+
+  clearAll?.addEventListener('click', () => {
+    checks.forEach(check => setChecked(check, false));
+    updateSummary();
+  });
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    const allocated = sumAllocations();
+    const received = parseMoney(totalInput.value);
+    if (allocated > received + 0.0001) {
+      alert('A soma distribuída entre os pagamentos não pode ser maior que o valor recebido.');
+      return;
+    }
+
+    const response = await fetch(form.action, {method: 'POST', body: new FormData(form)});
+    const payload = await response.json();
+    if (payload.status === 'success') location.reload();
+    else alert(payload.message || 'Erro ao registrar recebimento');
+  });
+
+  updateSummary();
+});
+</script>
+{% endblock %}

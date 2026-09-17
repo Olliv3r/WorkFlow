@@ -450,3 +450,76 @@ body {
 }
 
 .btn-payment-details{display:inline-flex;align-items:center;gap:.35rem;text-decoration:none;border:1px solid var(--border);background:#fff;color:var(--ink);border-radius:6px;padding:.4rem .65rem;font-size:.78rem;font-weight:600}.btn-payment-details:hover{background:#f7f5f0;color:var(--ink)}
+
+/* ===== Distribuição de recebimentos ===== */
+.receipt-help {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  margin: -0.45rem 0 1.25rem;
+  max-width: 78ch;
+}
+
+.receipt-allocation {
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+}
+
+.receipt-allocation-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.receipt-allocation-title {
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+}
+
+.receipt-allocation-sub {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+.receipt-allocation-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.receipt-allocation-table .allocation-amount {
+  min-width: 140px;
+}
+
+.receipt-allocation-table .form-check-input:checked {
+  background-color: var(--settle);
+  border-color: var(--settle);
+}
+
+.receipt-allocation-summary {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.85rem;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+}
+
+.receipt-allocation-summary strong {
+  color: var(--ink);
+}
+
+.receipt-allocation-summary .allocation-warning,
+.receipt-allocation-summary .allocation-warning strong {
+  color: var(--danger);
+}
+
+@media (max-width: 768px) {
+  .receipt-allocation-actions { width: 100%; }
+  .receipt-allocation-actions .btn { flex: 1; }
+  .receipt-allocation-summary { justify-content: flex-start; }
+}

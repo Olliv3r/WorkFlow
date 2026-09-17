@@ -109,13 +109,38 @@ def toggle_status(payment_id):
 @bp.route("/receipt/create", methods=["POST"])
 def receipt_create():
     payment_id = request.form.get("payment_id") or None
+
+    allocations = []
+    for raw_payment_id in request.form.getlist("allocation_payment_ids"):
+        try:
+            allocation_payment_id = int(raw_payment_id)
+        except (TypeError, ValueError):
+            raise ValidationError("Pagamento selecionado inválido")
+
+        raw_amount = request.form.get(f"allocation_amount_{allocation_payment_id}")
+        if raw_amount in (None, ""):
+            raise ValidationError(
+                f"Informe quanto do recebimento pertence ao pagamento #{allocation_payment_id}"
+            )
+        allocations.append({
+            "payment_id": allocation_payment_id,
+            "amount": raw_amount,
+        })
+
     receipt = ps.register_receipt(
         request.form.get("amount"),
         request.form.get("date"),
         request.form.get("observation"),
-        payment_id,
+        payment_id=payment_id,
+        allocations=allocations,
     )
-    return jsonify(status="success", message="Recebimento registrado com sucesso", id=receipt.id)
+    return jsonify(
+        status="success",
+        message="Recebimento registrado com sucesso",
+        id=receipt.id,
+        allocated_amount=float(receipt.allocated_amount),
+        unallocated_amount=float(receipt.unallocated_amount),
+    )
 
 
 @bp.route("/receivables", methods=["GET"])

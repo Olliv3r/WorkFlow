@@ -1,7 +1,5 @@
 # WorkFlow
 
-![Preview](assets/preview.png)
-
 **Versão atual: v0.0.8**
 
 O **WorkFlow** é um sistema web em **Python + Flask** criado para registrar produções, organizar produtos e preços, controlar diárias e vales, realizar fechamentos e acompanhar valores recebidos e pendentes.
@@ -177,6 +175,10 @@ Um fechamento pode estar:
 - quitado.
 
 Recebimentos posteriores podem ser associados a um fechamento conhecido. Quando a origem não é conhecida, o sistema permite registrar o recebimento sem inventar automaticamente qual fechamento ele quitou.
+
+Um único recebimento também pode ser distribuído entre **vários fechamentos pendentes**. Cada pagamento pode receber um valor diferente, inclusive parcial, e qualquer pendência pode ser deixada de fora. A opção **Selecionar todas** facilita o caso em que todo o saldo pendente foi recebido de uma vez.
+
+A soma distribuída nunca pode ultrapassar o valor efetivamente recebido. Se parte do recebimento não for vinculada a nenhum fechamento, essa diferença permanece registrada como valor sem origem identificada.
 
 A área de Pendências permite acompanhar os saldos ainda a receber por fechamento.
 

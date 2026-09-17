@@ -142,14 +142,31 @@ class PaymentService:
         }
 
     @staticmethod
-    def register_receipt(amount, receipt_date=None, observation=None, payment_id=None):
+    def register_receipt(amount, receipt_date=None, observation=None, payment_id=None, allocations=None):
+        """Registra dinheiro recebido e, quando conhecido, distribui-o entre fechamentos.
+
+        ``allocations`` aceita uma lista de dicionários com ``payment_id`` e
+        ``amount``. O total alocado pode ser menor que o valor recebido; nesse
+        caso, a diferença permanece como recebimento sem origem identificada.
+
+        ``payment_id`` foi mantido para compatibilidade com o formulário da
+        página de detalhes de um único fechamento.
+        """
         from app.models import Receipt, ReceiptAllocation
-        try:
-            amount = Decimal(str(amount).replace(",", "."))
-        except Exception:
-            raise ValidationError("Valor recebido inválido")
+
+        def parse_money(value, field_name):
+            try:
+                parsed = Decimal(str(value).strip().replace(",", "."))
+            except Exception:
+                raise ValidationError(f"{field_name} inválido")
+            if not parsed.is_finite():
+                raise ValidationError(f"{field_name} inválido")
+            return parsed.quantize(Decimal("0.01"))
+
+        amount = parse_money(amount, "Valor recebido")
         if amount <= 0:
             raise ValidationError("O valor recebido deve ser maior que zero")
+
         if receipt_date in (None, ""):
             receipt_date = date.today()
         elif isinstance(receipt_date, str):
@@ -158,21 +175,57 @@ class PaymentService:
             except ValueError:
                 raise ValidationError("Data de recebimento inválida")
 
-        payment = None
-        if payment_id is not None:
-            payment = PaymentService.get_payment(int(payment_id))
-            if amount > payment.pending_amount:
+        raw_allocations = list(allocations or [])
+        # Compatibilidade: a tela de detalhes continua enviando apenas payment_id.
+        if not raw_allocations and payment_id not in (None, ""):
+            raw_allocations = [{"payment_id": payment_id, "amount": amount}]
+
+        normalized_allocations = []
+        seen_payment_ids = set()
+        allocated_total = Decimal("0.00")
+
+        for item in raw_allocations:
+            try:
+                allocation_payment_id = int(item.get("payment_id"))
+            except (TypeError, ValueError, AttributeError):
+                raise ValidationError("Pagamento selecionado inválido")
+
+            if allocation_payment_id in seen_payment_ids:
+                raise ValidationError("O mesmo pagamento foi selecionado mais de uma vez")
+            seen_payment_ids.add(allocation_payment_id)
+
+            allocation_amount = parse_money(item.get("amount"), "Valor da alocação")
+            if allocation_amount <= 0:
+                raise ValidationError("O valor destinado a cada pagamento deve ser maior que zero")
+
+            payment = PaymentService.get_payment(allocation_payment_id)
+            pending_amount = payment.pending_amount
+            if allocation_amount > pending_amount:
                 raise ValidationError(
-                    f"Este fechamento possui apenas R$ {payment.pending_amount:.2f} pendentes"
+                    f"O pagamento #{payment.id} possui apenas R$ {pending_amount:.2f} pendentes"
                 )
 
-        receipt = Receipt(date=receipt_date, amount=amount,
-                          observation=(observation or "").strip() or None)
+            normalized_allocations.append((payment, allocation_amount))
+            allocated_total += allocation_amount
+
+        if allocated_total > amount:
+            raise ValidationError(
+                f"A soma destinada aos pagamentos (R$ {allocated_total:.2f}) "
+                f"não pode ultrapassar o valor recebido (R$ {amount:.2f})"
+            )
+
+        receipt = Receipt(
+            date=receipt_date,
+            amount=amount,
+            observation=(observation or "").strip() or None,
+        )
         try:
             db.session.add(receipt)
             db.session.flush()
-            if payment is not None:
-                db.session.add(ReceiptAllocation(receipt=receipt, payment=payment, amount=amount))
+            for payment, allocation_amount in normalized_allocations:
+                db.session.add(ReceiptAllocation(
+                    receipt=receipt, payment=payment, amount=allocation_amount
+                ))
             db.session.commit()
         except Exception:
             db.session.rollback()
